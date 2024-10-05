@@ -24,23 +24,8 @@ class Server:
         self.gpt = Gpt(self.client)
         self.interviewer = Interviewer(self.client)
 
-        self.rooms = {}
-
     def set_manager(self, manager):
         self.manager = manager
-
-    # room structure:
-    """
-    {
-        room: str (id)
-        clients: list of (client id, client name)
-        company: str
-        position: str
-        room_name: str
-        max_people: int
-        max_questions: int
-    }
-    """
 
     async def run(self):
         print("running")
@@ -52,6 +37,8 @@ class Server:
             client_id = message_data.get("client_id")
             message = message_data.get("message")
             type = message_data.get("type")
+
+            print(message)
 
             # HAVE TYPE STUFF HERE
             if (type == "message"):
@@ -65,6 +52,14 @@ class Server:
             elif (type == "answer"):
                 # handle
                 pass
+
+            # read, then process camera frame
+            if False:
+                frame = None
+                # process frame here
+                score = self.interviewer.score_frame(frame)
+                broadcast_message = f"Posture {score[0]} {score[1]}"
+                await self.manager.send_message(broadcast_message, room)
 
             # print(message)
 
