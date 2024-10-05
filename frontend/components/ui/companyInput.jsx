@@ -5,17 +5,15 @@ import Image from "next/image";
 import { cn, getMostCommonColor } from "@/lib/utils";
 import useAccentStore from "@/stores/accentStore";
 
+import { getCompanyLogo } from "@/lib/utils";
+
 const Input = React.forwardRef(
 	({ className, type, setValue, ...props }, ref) => {
 		const setAccent = useAccentStore((state) => state.setAccent);
 		const [company, setCompany] = useState("");
 
 		useEffect(() => {
-			getMostCommonColor(
-				"https://img.logo.dev/" +
-					company +
-					".com?token=pk_dD4gvgScSGCtlxrRTAYRKw"
-			).then((color) => {
+			getMostCommonColor(getCompanyLogo(company)).then((color) => {
 				setAccent(color);
 			});
 		}, [company]);
@@ -28,11 +26,11 @@ const Input = React.forwardRef(
 		return (
 			<div
 				className={cn(
-					"flex items-center gap-2 h-9 w-full rounded-md border border-input bg-transparent pr-3 pl-2 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+					"flex items-center gap-2 h-9 w-full rounded-md border border-input bg-transparent pr-3 pl-2 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 focus-within:outline",
 					className
 				)}
 			>
-				{company != "" ? (
+				{company ? (
 					<Image
 						alt={company + " Logo"}
 						width={50}
@@ -40,9 +38,7 @@ const Input = React.forwardRef(
 						className='size-6'
 						src={
 							company != ""
-								? "https://img.logo.dev/" +
-								  company +
-								  ".com?token=pk_dD4gvgScSGCtlxrRTAYRKw"
+								? getCompanyLogo(company)
 								: "https://via.placeholder.com/50"
 						}
 					/>

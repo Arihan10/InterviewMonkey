@@ -43,8 +43,6 @@ class Gpt:
 
         completion = response.choices[0].message.content
 
-        completion = completion.strip().lstrip("```json").rstrip("```")
-
         # DEBUG
         # print(completion)
         # with open("openai_response.txt", "w") as f:
@@ -102,4 +100,3 @@ class Gpt:
         #     f.write(completion)
 
         return json.loads(completion)
-

@@ -1,6 +1,7 @@
 "use client";
 
 import { CompanyInputWithButton } from "@/components/ui/CompanyInputWithButton";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { TypographyH2 } from "../ui/typo/TypographyH2";
 import { TypographyH4 } from "../ui/typo/TypographyH4";
@@ -12,26 +13,48 @@ import { Slider } from "@/components/ui/slider";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
+import useRoomStore from "@/stores/roomStore";
+
 const Create = () => {
 	const [company, setCompany] = useState("");
+	const [role, setRole] = useState("");
 	const [maxParticipants, setMaxParticipants] = useState(2);
 	const [numQuestions, setNumQuestions] = useState(5);
 	const [room, setRoom] = useState("");
 	const [user, setUser] = useState("");
 
+	const setAllRoomDetails = useRoomStore((state) => state.setAllRoomDetails);
+
 	// useEffect(() => {
 	// 	console.log("Company: ", company);
+	// 	console.log("Role: ", role);
 	// 	console.log("Max Participants: ", maxParticipants);
 	// 	console.log("Number of Questions: ", numQuestions);
 	// 	console.log("Room: ", room);
 	// 	console.log("User: ", user);
-	// }, [company, maxParticipants, numQuestions, room, user]);
+	// }, [company, maxParticipants, numQuestions, room, user, role]);
 
 	const router = useRouter();
 
 	const handleCreateRoom = () => {
 		const newRoom = Math.random().toString(36).substr(2, 9); // Generate a random room ID
-		router.push(`/room/${newRoom}`);
+
+		setAllRoomDetails({
+			company,
+			maxParticipants,
+			numQuestions,
+			room,
+			user,
+			roomId: newRoom,
+		});
+		//TODO: send room details to the backend here
+		// HERE
+		// HERE
+		// HERE
+		// HERE
+		// router.push(`/testroom`);
+		// Uncomment this when testing is done
+		router.push(`/room/room/${newRoom}`);
 	};
 
 	return (
@@ -50,6 +73,15 @@ const Create = () => {
 							<CompanyInputWithButton
 								setValue={setCompany}
 								placeholder='Google'
+								buttonText={"Search"}
+								type={"text"}
+							/>
+						</div>
+						<div>
+							<TypographyP>Enter a Role</TypographyP>
+							<Input
+								setValue={setRole}
+								placeholder='Software Engineer'
 								buttonText={"Search"}
 								type={"text"}
 							/>
