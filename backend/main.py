@@ -36,15 +36,15 @@ class ConnectionManager:
     def __init__(self):
         self.active_connections: dict = {}
 
-    async def connect(self, websocket: WebSocket, room: str, client_id: str):
+    async def connect(self, websocket: WebSocket, room: str):
         await websocket.accept()
         if room not in self.active_connections:
-            self.active_connections[room] = {}
-        self.active_connections[room].put(client_id, websocket)
-        
-    def disconnect(self, room: str, client_id: str):
+            self.active_connections[room] = []
+        self.active_connections[room].append(websocket)
+
+    def disconnect(self, websocket: WebSocket, room: str):
         if room in self.active_connections:
-            del self.active_connections[room][client_id]
+            self.active_connections[room].remove(websocket)
             if not self.active_connections[room]:
                 del self.active_connections[room]
 
@@ -64,7 +64,6 @@ manager = ConnectionManager()
 @app.websocket("/ws/{room}")
 async def websocket_endpoint(websocket: WebSocket, room: str):
     await manager.connect(websocket, room)
-    disconnect_id: str = None
     try:
         while True:
             data = await websocket.receive_text()
@@ -72,11 +71,9 @@ async def websocket_endpoint(websocket: WebSocket, room: str):
 
             print(message_data)
 
-            disconnect_id = message_data.get("client_id")
-
             await asyncQueue.put((message_data, room))
     except WebSocketDisconnect:
-        manager.disconnect(room, disconnect_id)
+        manager.disconnect(room)
 
 @app.post("/create/{room}")
 async def create_room(room: str, company: str = "Shopify", position: str = "Software Engineer", room_name: str = "", name: str = "Guest", max_people: int = 2, max_questions: int = 5):

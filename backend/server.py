@@ -41,31 +41,6 @@ class Server:
         max_questions: int
     }
     """
-    async def open_room(self, room, company, position, room_name, name, max_people, max_questions):
-        self.rooms[room] = {
-            "room": room,
-            "clients": set(),
-            "company": company,
-            "position": position,
-            "room_name": room_name,
-            "max_people": max_people,
-            "max_questions": max_questions
-        }
-        return await self.join_room(room, name)
-
-    async def join_room(self, room, name):
-        client_id = randint(0, 100000)
-        while client_id in self.rooms[room]["clients"]:
-            client_id = randint(0, 100000)
-        self.rooms[room]["clients"].append((client_id, name))
-        return client_id
-
-    async def get_room(self, room):
-        # modify data so that the entire room data isnt sent but just what the user needs to see
-        return self.rooms.get(room)
-
-    async def close_room(self, room):
-        del self.rooms
 
     async def run(self):
         print("running")

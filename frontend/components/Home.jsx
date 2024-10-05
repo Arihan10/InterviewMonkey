@@ -8,8 +8,8 @@ const Home = () => {
 	const router = useRouter();
 
 	const handleCreateRoom = () => {
-		const newRoom = Math.random().toString(36).substr(2, 9); // Generate a random room ID
-		router.push(`/room/${newRoom}`);
+		// const newRoom = Math.random().toString(36).substr(2, 9); // Generate a random room ID
+		router.push(`/room/${room}`);
 	};
 
 	const handleJoinRoom = () => {
