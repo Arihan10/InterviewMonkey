@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import mediapipe as mp
-from fer import FER
+#from fer import FER
 
 mp_pose = mp.solutions.pose
 pose = mp_pose.Pose(static_image_mode=True, min_detection_confidence=0.5)
@@ -55,13 +55,13 @@ def check_posture(frame):
         mp.solutions.drawing_utils.draw_landmarks(frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
         analyze_posture(results.pose_landmarks.landmark)
 
+# detector = FER()
 
-def check_facial_expressions(frame):
-    """
-    Check the facial expressions of the interviewee
-    """
-    detector = FER()
-    print(detector.top_emotion(frame))
+# def check_facial_expressions(frame):
+#     """
+#     Check the facial expressions of the interviewee
+#     """
+#     print(detector.top_emotion(frame))
 
 
 
