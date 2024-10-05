@@ -1,12 +1,13 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 import json
+import asyncio
 
 from server import Server
 
 app = FastAPI()
 
-server = Server()
+asyncQueue = asyncio.Queue()
 
 # CORS middleware to allow React app to communicate with FastAPI
 app.add_middleware(
@@ -16,8 +17,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-asyncQueue = asyncio.Queue()
 
 # Manage rooms and connections
 class ConnectionManager:
@@ -50,13 +49,14 @@ async def websocket_endpoint(websocket: WebSocket, room: str):
         while True:
             data = await websocket.receive_text()
             message_data = json.loads(data)
-            client_id = message_data.get("clientId")
-            message = message_data.get("message")
 
-            # server run
-
-            # Format the broadcast message with client ID
-            broadcast_message = f"Client {client_id} says: {message}"
-            await manager.send_message(broadcast_message, room)
+            await asyncQueue.put((message_data, room))
     except WebSocketDisconnect:
         manager.disconnect(websocket, room)
+
+server = Server(asyncQueue=asyncQueue, manager=manager)
+
+async def startup_event():
+    asyncio.create_task(server.run())
+
+app.add_event_handler("startup", startup_event)
