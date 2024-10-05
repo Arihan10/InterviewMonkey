@@ -1,0 +1,42 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { TypographyH2 } from "../ui/typo/TypographyH2";
+import { TypographyH4 } from "../ui/typo/TypographyH4";
+import { TypographyP } from "../ui/typo/TypographyP";
+
+import { InputWithButton } from "@/components/ui/inputWithButton";
+import { useState, useEffect } from "react";
+
+const Create = () => {
+	const [roomCode, setRoomCode] = useState("");
+
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		console.log(roomCode);
+	};
+
+	return (
+		<div className='flex flex-1 w-full'>
+			<div className='flex flex-col w-full gap-6'>
+				<div>
+					<TypographyH2>Create an Interview Room</TypographyH2>
+					<TypographyH4>
+						Choose any company, test your skills against others
+					</TypographyH4>
+				</div>
+				<form className='flex gap-8' onSubmit={handleSubmit}>
+					<InputWithButton
+						placeholder={"ABCD1234"}
+						type={"text"}
+						buttonText={"Join Room"}
+						disabled={!roomCode}
+						setValue={setRoomCode}
+					/>
+				</form>
+			</div>
+		</div>
+	);
+};
+
+export default Create;
