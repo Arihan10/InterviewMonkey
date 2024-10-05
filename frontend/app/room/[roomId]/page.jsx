@@ -21,7 +21,21 @@ const Room = () => {
 
 			// Handle incoming messages from the server
 			socket.onmessage = (event) => {
-				setMessages((prev) => [...prev, event.data]);
+				console.log(event)
+
+				const data = JSON.parse(event.data); 
+
+				switch (data.type) {
+					case 'message': 
+						setMessages((prev) => [...prev, `Message: ${data.message}`]); 
+						break; 
+					case 'rating':
+						setMessages((prev) => [...prev, `Rating: ${data.message}`]);
+						break;
+					default: 
+						setMessages((prev) => [...prev, `Unhandled Type: ${data.message}`]); 
+						break; 
+				}
 			};
 			ran.current = true; 
 		}
@@ -33,11 +47,12 @@ const Room = () => {
 		};
 	}, [roomId]);
   
-	const handleSendMessage = () => {
+	const handleSendMessage = (type) => {
 	  if (socket) {
 		const payload = {
-		  clientId: clientId, // Send the client's unique ID with the message
-		  message: message
+			type: type,
+			clientId: clientId, // Send the client's unique ID with the message
+			message: message
 		};
 		socket.send(JSON.stringify(payload));  // Send the payload as JSON
 		setMessage('');  // Clear the message input after sending
@@ -58,9 +73,10 @@ const Room = () => {
 		  onChange={(e) => setMessage(e.target.value)}
 		  placeholder="Type a message"
 		/>
-		<button onClick={handleSendMessage}>Send</button>
+		<button onClick={() => handleSendMessage('message')}>Send Message</button>
+		<button onClick={() => handleSendMessage('rating')}>Send Rating</button>
 	  </div>
 	);
-  };
+};
   
-  export default Room;
+export default Room;

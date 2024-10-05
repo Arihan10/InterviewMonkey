@@ -38,7 +38,8 @@ class ConnectionManager:
     async def send_message(self, message: str, room: str):
         if room in self.active_connections:
             for connection in self.active_connections[room]:
-                await connection.send_text(message)
+                json_message = json.dumps(message)
+                await connection.send_text(json_message)
 
 manager = ConnectionManager()
 
@@ -49,6 +50,8 @@ async def websocket_endpoint(websocket: WebSocket, room: str):
         while True:
             data = await websocket.receive_text()
             message_data = json.loads(data)
+
+            print(message_data)
 
             await asyncQueue.put((message_data, room))
     except WebSocketDisconnect:
