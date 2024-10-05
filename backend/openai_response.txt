@@ -1,10 +1,1 @@
-{
-    "summary": "Shopify seeks candidates who can demonstrate both technical skills and cultural fit during the interview process. Candidates are expected to articulate past experiences clearly and competitively, showing a strong understanding of software engineering principles, proficiency in coding, and the ability to collaborate effectively. During the 'Life Story' interviews, the company values an organic conversation that reveals a candidate's personality, passion for technology, and alignment with Shopify's core values. Ideally, candidates should exhibit practical problem-solving approaches and proactive thinking in technical discussions while also showcasing adaptability and self-awareness throughout the interview.",
-    "questions": [
-        "Why Shopify and what excites you about this role?",
-        "Can you describe a coding project you've worked on that you are particularly proud of?",
-        "How do you approach debugging and optimizing a codebase?",
-        "Explain the concept of 'metafields' in Shopify and how you might use them.",
-        "Describe a challenging system you've designed or worked on and the impact it had."
-    ]
-}
+65

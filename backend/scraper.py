@@ -10,13 +10,17 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import StaleElementReferenceException
+
+from gpt import Gpt
 
 
 class Scraper:
-    def __init__(self, client):
-        self.client = client
-        self.driver = webdriver.Chrome()
+    def __init__(self):
+        options = Options()
+        # options.add_argument('--headless=new')
+        self.driver = webdriver.Chrome(options=options)
 
     def get_contents(self, company, position) -> List[str]:
         """
@@ -27,9 +31,19 @@ class Scraper:
 
         html_contents: List[Tuple[str, str, str]] = []
         try:
-            results = WebDriverWait(self.driver, 10).until(
-                EC.visibility_of_all_elements_located((By.XPATH, '(//h3)[position() <= 5]'))
+            search = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.ID, "search"))
             )
+
+            print("Found search", search)
+
+            # Somehow doesn't work???
+
+            # results = WebDriverWait(self.driver, 10).until(
+            #     EC.visibility_of_all_elements_located((By.XPATH, '(//h3)[position() <= 5]'))
+            # )
+
+            results = self.driver.find_elements(By.XPATH, '(//h3)[position() <= 5]')
 
             links: List[Tuple[str, str]] = []
             for result in results:
@@ -98,54 +112,6 @@ class Scraper:
         self.driver.quit()
 
         return final_output_contents
-    
-    def gen_questions(self, company, position, n, all_contents):
-        prompt = """
-        Given a text dump of a composite of the five top sites for providing information for interviewing at a COMPANY for a ROLE, you will generate a list of N interview questions tailored to the company role based on the provided text information, and generate a specific summary of the type of responses and behaviour the company expects from the candidate during the interview. 
-
-        You will provide a response in the following JSON format:
-
-        {
-            "summary": "[summary]",
-            "questions": [
-                "Generic example: Why do you want to work at Microsoft?",
-                "Generic example: When did you start programming?",
-                ...
-            ]
-        }
-
-        Provide only the above JSON and nothing else.
-        """
-
-        user_prompt = f"""
-        COMPANY: {company}
-        ROLE: {position}
-        TEXT DUMP: {all_contents}
-        N: {n}
-        """
-
-        print("User prompt: ", user_prompt)
-
-        response = self.client.chat.completions.create(
-            messages=[{
-                "role": "system",
-                "content": prompt
-            }, {
-                "role": "user",
-                "content": user_prompt
-            }],
-            model="gpt-4o-mini"
-        )
-
-        completion = response.choices[0].message.content
-
-        completion = completion.strip().lstrip("```json").rstrip("```")
-
-        print(completion)
-        with open("openai_response.txt", "w") as f:
-            f.write(completion)
-
-        return json.loads(completion)
 
 if __name__ == "__main__":
     from dotenv import load_dotenv
@@ -153,33 +119,35 @@ if __name__ == "__main__":
     load_dotenv()
 
     company = "shopify"
-    position = "software engineering"
+    position = "qa"
+
+    n = 5
 
     client = OpenAI(
         api_key = os.environ.get("OPENAI_API_KEY"),
         organization = os.environ.get("OPENAI_ORGANIZATION")
     )
 
-    scraper = Scraper(client)
+    scraper = Scraper()
     
     all_contents = scraper.get_contents(company, position)
 
-    n = 5
+    gpt = Gpt(client)
 
-    output = scraper.gen_questions(company, position, n, '\n\n'.join(all_contents))
+    output = gpt.gen_questions(company, position, n, '\n\n'.join(all_contents))
+
     print("JSON output:\n", output)
     print(len(output["questions"]))
 
-    prompt = """
-"""
 
-    client.chat.completions.create(
-        messages=[{
-            "role": "system",
-            "content": prompt
-        }, {
-            "role": "user",
-            "content": user_prompt
-        }]
-    )
+    # interviewer pipeline
+
+    question = output["questions"][0]
+
+    response = input(question)
+
+    score = gpt.score(company, position, output["summary"], question, response)
+
+    print("Score:", score)
+
 
