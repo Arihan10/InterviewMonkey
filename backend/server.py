@@ -8,6 +8,8 @@ from interviewer import Interviewer
 
 import asyncio
 
+from dotenv import load_dotenv
+load_dotenv()
 
 class Server:
     def __init__(self, asyncQueue: asyncio.Queue):
