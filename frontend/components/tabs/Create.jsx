@@ -10,6 +10,7 @@ import CardWithForm from "@/components/tabs/NameCard";
 import { Slider } from "@/components/ui/slider";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const Create = () => {
 	const [company, setCompany] = useState("");
@@ -25,6 +26,13 @@ const Create = () => {
 	// 	console.log("Room: ", room);
 	// 	console.log("User: ", user);
 	// }, [company, maxParticipants, numQuestions, room, user]);
+
+	const router = useRouter();
+
+	const handleCreateRoom = () => {
+		const newRoom = Math.random().toString(36).substr(2, 9); // Generate a random room ID
+		router.push(`/room/${newRoom}`);
+	};
 
 	return (
 		<div className='flex flex-1 w-full'>
@@ -47,7 +55,9 @@ const Create = () => {
 							/>
 						</div>
 						<div className='space-y-2'>
-							<TypographyP>Max Participants</TypographyP>
+							<TypographyP>
+								Max Participants: {maxParticipants}
+							</TypographyP>
 							<Slider
 								defaultValue={[2]}
 								max={5}
@@ -56,7 +66,9 @@ const Create = () => {
 							/>
 						</div>
 						<div className='space-y-2'>
-							<TypographyP># of Questions</TypographyP>
+							<TypographyP>
+								# of Questions: {numQuestions}
+							</TypographyP>
 							<Slider
 								defaultValue={[5]}
 								max={10}
@@ -85,6 +97,7 @@ const Create = () => {
 								)
 							}
 							className='disabled:opacity-40'
+							onClick={handleCreateRoom}
 						>
 							Create Room
 						</Button>

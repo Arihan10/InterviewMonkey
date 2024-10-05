@@ -7,13 +7,17 @@ import { TypographyP } from "../ui/typo/TypographyP";
 
 import { InputWithButton } from "@/components/ui/inputWithButton";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const Create = () => {
 	const [roomCode, setRoomCode] = useState("");
 
-	const handleSubmit = (e) => {
-		e.preventDefault();
-		console.log(roomCode);
+	const router = useRouter();
+
+	const handleJoinRoom = () => {
+		if (room) {
+			router.push(`/room/${roomCode}`);
+		}
 	};
 
 	return (
@@ -25,7 +29,7 @@ const Create = () => {
 						Choose any company, test your skills against others
 					</TypographyH4>
 				</div>
-				<form className='flex gap-8' onSubmit={handleSubmit}>
+				<form className='flex gap-8' onSubmit={handleJoinRoom}>
 					<InputWithButton
 						placeholder={"ABCD1234"}
 						type={"text"}

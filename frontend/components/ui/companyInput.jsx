@@ -2,11 +2,23 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+import { cn, getMostCommonColor } from "@/lib/utils";
+import useAccentStore from "@/stores/accentStore";
 
 const Input = React.forwardRef(
 	({ className, type, setValue, ...props }, ref) => {
+		const setAccent = useAccentStore((state) => state.setAccent);
 		const [company, setCompany] = useState("");
+
+		useEffect(() => {
+			getMostCommonColor(
+				"https://img.logo.dev/" +
+					company +
+					".com?token=pk_dD4gvgScSGCtlxrRTAYRKw"
+			).then((color) => {
+				setAccent(color);
+			});
+		}, [company]);
 
 		const handleChange1 = (e) => {
 			setValue(e.target.value);
@@ -20,19 +32,21 @@ const Input = React.forwardRef(
 					className
 				)}
 			>
-				{(company && (
+				{company != "" ? (
 					<Image
 						alt={company + " Logo"}
 						width={50}
 						height={50}
 						className='size-6'
 						src={
-							"https://img.logo.dev/" +
-							company +
-							".com?token=pk_dD4gvgScSGCtlxrRTAYRKw"
+							company != ""
+								? "https://img.logo.dev/" +
+								  company +
+								  ".com?token=pk_dD4gvgScSGCtlxrRTAYRKw"
+								: "https://via.placeholder.com/50"
 						}
 					/>
-				)) || (
+				) : (
 					<div className='flex items-center justify-center bg-gray-300 rounded-full size-6'>
 						G
 					</div>
