@@ -68,3 +68,32 @@ export function getMostCommonColor(imageUrl) {
 		};
 	});
 }
+
+export function getCompanyLogo(company) {
+	return `https://img.logo.dev/${company}.com?token=pk_dD4gvgScSGCtlxrRTAYRKw`;
+}
+
+export const isTooDarkForBlackText = (rgbString) => {
+	// Extract the RGB values from the string
+	const rgbValues = rgbString.match(/\d+/g)?.map(Number);
+	if (!rgbValues || rgbValues.length !== 3) {
+		throw new Error("Invalid RGB string format");
+	}
+
+	const [r, g, b] = rgbValues;
+
+	// Helper function to convert RGB to sRGB
+	const getSRGB = (c) => {
+		const normalized = c / 255;
+		return normalized <= 0.03928
+			? normalized / 12.92
+			: Math.pow((normalized + 0.055) / 1.055, 2.4);
+	};
+
+	// Calculate the relative luminance
+	const luminance =
+		0.2126 * getSRGB(r) + 0.7152 * getSRGB(g) + 0.0722 * getSRGB(b);
+
+	// Return true if luminance is below the threshold (too dark for black text)
+	return luminance < 0.179;
+};

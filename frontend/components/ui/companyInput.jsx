@@ -5,17 +5,15 @@ import Image from "next/image";
 import { cn, getMostCommonColor } from "@/lib/utils";
 import useAccentStore from "@/stores/accentStore";
 
+import { getCompanyLogo } from "@/lib/utils";
+
 const Input = React.forwardRef(
 	({ className, type, setValue, ...props }, ref) => {
 		const setAccent = useAccentStore((state) => state.setAccent);
 		const [company, setCompany] = useState("");
 
 		useEffect(() => {
-			getMostCommonColor(
-				"https://img.logo.dev/" +
-					company +
-					".com?token=pk_dD4gvgScSGCtlxrRTAYRKw"
-			).then((color) => {
+			getMostCommonColor(getCompanyLogo(company)).then((color) => {
 				setAccent(color);
 			});
 		}, [company]);
@@ -32,7 +30,7 @@ const Input = React.forwardRef(
 					className
 				)}
 			>
-				{company != "" ? (
+				{company ? (
 					<Image
 						alt={company + " Logo"}
 						width={50}
@@ -40,9 +38,7 @@ const Input = React.forwardRef(
 						className='size-6'
 						src={
 							company != ""
-								? "https://img.logo.dev/" +
-								  company +
-								  ".com?token=pk_dD4gvgScSGCtlxrRTAYRKw"
+								? getCompanyLogo(company)
 								: "https://via.placeholder.com/50"
 						}
 					/>

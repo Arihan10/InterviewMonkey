@@ -24,9 +24,9 @@ const Create = () => {
 		<div className='flex flex-1 w-full'>
 			<div className='flex flex-col w-full gap-6'>
 				<div>
-					<TypographyH2>Create an Interview Room</TypographyH2>
+					<TypographyH2>Join an Interview Room</TypographyH2>
 					<TypographyH4>
-						Choose any company, test your skills against others
+						Join anyone, test your skills against others
 					</TypographyH4>
 				</div>
 				<form className='flex gap-8' onSubmit={handleJoinRoom}>

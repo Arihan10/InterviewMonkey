@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
+import Logo from "@/components/TheLogo";
+
 import Create from "@/components/tabs/Create";
 import Join from "@/components/tabs/Join";
 
@@ -26,28 +28,31 @@ const Home = () => {
 	const accent = useAccentStore((state) => state.accent);
 
 	return (
-		<>
-			<Tabs
-				defaultValue='create'
-				className='max-w-[50rem] w-full flex flex-col gap-2'
-			>
-				<TabsList className='flex'>
-					<TabsTrigger value='create' className='flex-1'>
-						Create Room
-					</TabsTrigger>
-					<TabsTrigger value='join' className='flex-1'>
-						Join Room
-					</TabsTrigger>
-				</TabsList>
-				<div className='px-6 py-6 border-[1px] border-muted shadow-sm rounded-md min-h-[28rem] bg-white'>
-					<TabsContent value='create'>
-						<Create />
-					</TabsContent>
-					<TabsContent value='join'>
-						<Join />
-					</TabsContent>
-				</div>
-			</Tabs>
+		<div className='flex flex-col justify-center w-screen h-screen'>
+			<Logo />
+			<div className='flex items-center justify-center flex-1'>
+				<Tabs
+					defaultValue='create'
+					className='max-w-[50rem] w-full flex flex-col gap-2'
+				>
+					<TabsList className='flex'>
+						<TabsTrigger value='create' className='flex-1'>
+							Create Room
+						</TabsTrigger>
+						<TabsTrigger value='join' className='flex-1'>
+							Join Room
+						</TabsTrigger>
+					</TabsList>
+					<div className='px-6 py-6 border-[1px] border-muted shadow-sm rounded-md min-h-[28rem] bg-white'>
+						<TabsContent value='create'>
+							<Create />
+						</TabsContent>
+						<TabsContent value='join'>
+							<Join />
+						</TabsContent>
+					</div>
+				</Tabs>
+			</div>
 			<div
 				className='fixed z-[-10] w-screen h-screen '
 				style={{
@@ -55,7 +60,7 @@ const Home = () => {
 					backgroundColor: accent,
 				}}
 			></div>
-		</>
+		</div>
 	);
 
 	// return (
