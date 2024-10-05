@@ -6,7 +6,7 @@
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from typing import List
+import json
 
 app = FastAPI()
 
@@ -49,6 +49,12 @@ async def websocket_endpoint(websocket: WebSocket, room: str):
     try:
         while True:
             data = await websocket.receive_text()
-            await manager.send_message(f"Message from {room}: {data}", room)
+            message_data = json.loads(data)
+            client_id = message_data.get("clientId")
+            message = message_data.get("message")
+
+            # Format the broadcast message with client ID
+            broadcast_message = f"Client {client_id} says: {message}"
+            await manager.send_message(broadcast_message, room)
     except WebSocketDisconnect:
         manager.disconnect(websocket, room)
