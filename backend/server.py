@@ -70,10 +70,11 @@ class Server:
         print("running")
         
         while (True):
-            message_data, room, client_id = await self.asyncQueue.get()
+            message_data, room = await self.asyncQueue.get()
 
             # parse message
             message = message_data.get("message")
+            client_id = message_data.get("client_id")
 
             print(message)
 
