@@ -18,4 +18,3 @@ class Server:
         self.reader = Reader(self.client)
         self.interviewer = Interviewer(self.client)
 
-
