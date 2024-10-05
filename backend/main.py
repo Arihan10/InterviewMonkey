@@ -55,21 +55,24 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-@app.websocket("/ws/{room}/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, room: str, client_id: str):
+@app.websocket("/ws/{room}")
+async def websocket_endpoint(websocket: WebSocket, room: str):
     await manager.connect(websocket, room)
+    disconnect_id: str = None
     try:
         while True:
             data = await websocket.receive_text()
             message_data = json.loads(data)
 
-            await asyncQueue.put((message_data, room, client_id))
+            disconnect_id = message_data.get("client_id")
+
+            await asyncQueue.put((message_data, room))
     except WebSocketDisconnect:
-        manager.disconnect(room, client_id)
+        manager.disconnect(room, disconnect_id)
 
 @app.post("/create/{room}")
-async def create_room(room: str, company: str = "Shopify", room_name: str = "", name: str = "Guest", max_people: int = 2, max_questions: int = 5):
-    client_id = await asyncio.create_task(server.open_room(room, company, room_name, name, max_people, max_questions))
+async def create_room(room: str, company: str = "Shopify", position: str = "Software Engineer", room_name: str = "", name: str = "Guest", max_people: int = 2, max_questions: int = 5):
+    client_id = await asyncio.create_task(server.open_room(room, company, position, room_name, name, max_people, max_questions))
     return {
         "room": await server.get_room(room),
         "client_id": client_id
