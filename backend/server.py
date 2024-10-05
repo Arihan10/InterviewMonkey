@@ -74,12 +74,25 @@ class Server:
             message_data, room = await self.asyncQueue.get()
 
             # parse message
-            message = message_data.get("message")
             client_id = message_data.get("client_id")
+            message = message_data.get("message")
+            type = message_data.get("type")
 
-            print(message)
+            # HAVE TYPE STUFF HERE
+            if (type == "message"):
+                json_message = {
+                    "client_id": client_id,
+                    "type": type,
+                    "message": message,
+                }
+                 
+                await self.manager.send_message(json_message, room)
+            elif (type == "answer"):
+                # handle
+                pass
+
+            # print(message)
 
             # Format the broadcast message with client ID
-            broadcast_message = f"Client {client_id} says: {message}"
-            for id, name in self.rooms[room]["clients"]:             
-                await self.manager.send_message(broadcast_message, room, id)
+            # broadcast_message = f"Client {client_id} says: {message}"
+            # await self.manager.send_message(broadcast_message, room)

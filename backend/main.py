@@ -48,10 +48,16 @@ class ConnectionManager:
             if not self.active_connections[room]:
                 del self.active_connections[room]
 
-    async def send_message(self, message: str, room: str, client_id: str):
+    async def send_message(self, message: str, room: str, client_id: str = None):
+        json_message = json.dumps(message)
+
         if room in self.active_connections:
-            if client_id in self.active_connections[room]:
-                await self.active_connections[room][client_id].send_text(message)
+            if client_id:
+                if client_id in self.active_connections[room]:
+                    await self.active_connections[room][client_id].send_test(json_message)
+        else:
+            for connection in self.active_connections[room]:
+                await connection.send_text(json_message)
 
 manager = ConnectionManager()
 
@@ -63,6 +69,8 @@ async def websocket_endpoint(websocket: WebSocket, room: str):
         while True:
             data = await websocket.receive_text()
             message_data = json.loads(data)
+
+            print(message_data)
 
             disconnect_id = message_data.get("client_id")
 
