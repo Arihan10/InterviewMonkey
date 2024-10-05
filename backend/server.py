@@ -1,6 +1,5 @@
 import os
 from openai import OpenAI
-from random import randint
 
 from scraper import Scraper
 from gpt import Gpt
@@ -26,6 +25,12 @@ class Server:
 
     def set_manager(self, manager):
         self.manager = manager
+
+    def get_contents(self, company, position):
+        return self.scraper.get_contents(company, position)
+    
+    def gen_questions(self, company, position, n, all_contents):
+        return self.gpt.gen_questions(company, position, n, all_contents)
 
     async def run(self):
         print("running")
