@@ -7,6 +7,7 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 import json
+import asyncio
 
 app = FastAPI()
 
@@ -18,6 +19,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+asyncQueue = asyncio.Queue()
 
 # Manage rooms and connections
 class ConnectionManager:
@@ -52,6 +55,8 @@ async def websocket_endpoint(websocket: WebSocket, room: str):
             message_data = json.loads(data)
             client_id = message_data.get("clientId")
             message = message_data.get("message")
+
+            asyncQueue.put(message)
 
             # Format the broadcast message with client ID
             broadcast_message = f"Client {client_id} says: {message}"
