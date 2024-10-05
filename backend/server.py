@@ -35,17 +35,18 @@ class Server:
         room: str (id)
         clients: list of (client id, client name)
         company: str
+        position: str
         room_name: str
         max_people: int
         max_questions: int
     }
     """
-
-    async def open_room(self, room, company, room_name, name, max_people, max_questions):
+    async def open_room(self, room, company, position, room_name, name, max_people, max_questions):
         self.rooms[room] = {
             "room": room,
             "clients": set(),
             "company": company,
+            "position": position,
             "room_name": room_name,
             "max_people": max_people,
             "max_questions": max_questions
