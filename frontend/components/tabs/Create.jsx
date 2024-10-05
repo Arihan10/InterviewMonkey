@@ -1,6 +1,7 @@
 "use client";
 
 import { CompanyInputWithButton } from "@/components/ui/CompanyInputWithButton";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { TypographyH2 } from "../ui/typo/TypographyH2";
 import { TypographyH4 } from "../ui/typo/TypographyH4";
@@ -10,21 +11,51 @@ import CardWithForm from "@/components/tabs/NameCard";
 import { Slider } from "@/components/ui/slider";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+import useRoomStore from "@/stores/roomStore";
 
 const Create = () => {
 	const [company, setCompany] = useState("");
+	const [role, setRole] = useState("");
 	const [maxParticipants, setMaxParticipants] = useState(2);
 	const [numQuestions, setNumQuestions] = useState(5);
 	const [room, setRoom] = useState("");
 	const [user, setUser] = useState("");
 
+	const setAllRoomDetails = useRoomStore((state) => state.setAllRoomDetails);
+
 	// useEffect(() => {
 	// 	console.log("Company: ", company);
+	// 	console.log("Role: ", role);
 	// 	console.log("Max Participants: ", maxParticipants);
 	// 	console.log("Number of Questions: ", numQuestions);
 	// 	console.log("Room: ", room);
 	// 	console.log("User: ", user);
-	// }, [company, maxParticipants, numQuestions, room, user]);
+	// }, [company, maxParticipants, numQuestions, room, user, role]);
+
+	const router = useRouter();
+
+	const handleCreateRoom = () => {
+		const newRoom = Math.random().toString(36).substr(2, 9); // Generate a random room ID
+
+		setAllRoomDetails({
+			company,
+			maxParticipants,
+			numQuestions,
+			room,
+			user,
+			roomId: newRoom,
+		});
+		//TODO: send room details to the backend here
+		// HERE
+		// HERE
+		// HERE
+		// HERE
+		// router.push(`/testroom`);
+		// Uncomment this when testing is done
+		router.push(`/room/room/${newRoom}`);
+	};
 
 	return (
 		<div className='flex flex-1 w-full'>
@@ -46,8 +77,19 @@ const Create = () => {
 								type={"text"}
 							/>
 						</div>
+						<div>
+							<TypographyP>Enter a Role</TypographyP>
+							<Input
+								setValue={setRole}
+								placeholder='Software Engineer'
+								buttonText={"Search"}
+								type={"text"}
+							/>
+						</div>
 						<div className='space-y-2'>
-							<TypographyP>Max Participants</TypographyP>
+							<TypographyP>
+								Max Participants: {maxParticipants}
+							</TypographyP>
 							<Slider
 								defaultValue={[2]}
 								max={5}
@@ -56,7 +98,9 @@ const Create = () => {
 							/>
 						</div>
 						<div className='space-y-2'>
-							<TypographyP># of Questions</TypographyP>
+							<TypographyP>
+								# of Questions: {numQuestions}
+							</TypographyP>
 							<Slider
 								defaultValue={[5]}
 								max={10}
@@ -85,6 +129,7 @@ const Create = () => {
 								)
 							}
 							className='disabled:opacity-40'
+							onClick={handleCreateRoom}
 						>
 							Create Room
 						</Button>

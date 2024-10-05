@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import mediapipe as mp
-from fer import FER
+#from fer import FER
 
 mp_pose = mp.solutions.pose
 pose = mp_pose.Pose(static_image_mode=True, min_detection_confidence=0.5)
@@ -33,13 +33,10 @@ def analyze_posture(landmarks):
     shoulder_width = distance(left_shoulder, right_shoulder)
     head_width = distance(left_ear, right_ear)
 
-    if abs(180 - abs(shoulder_angle)) > 10:
-        #print(shoulder_angle)
-        pass
-
-    if abs(180 - abs(head_angle)) > 5:
-        #print(head_angle)
-        pass
+    
+    # [True, False] shoulders aligned, head aligned
+    return [abs(180 - abs(shoulder_angle)) < 10, abs(180 - abs(head_angle)) > 5]
+    
 
 
 def check_posture(frame):
@@ -53,16 +50,17 @@ def check_posture(frame):
 
     if results.pose_landmarks:
         mp.solutions.drawing_utils.draw_landmarks(frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
-        analyze_posture(results.pose_landmarks.landmark)
+        return analyze_posture(results.pose_landmarks.landmark)
 
+    
 
-def check_facial_expressions(frame):
-    """
-    Check the facial expressions of the interviewee
-    """
-    detector = FER()
-    print(detector.top_emotion(frame))
+# detector = FER()
 
+# def check_facial_expressions(frame):
+#     """
+#     Check the facial expressions of the interviewee
+#     """
+#     print(detector.top_emotion(frame))
 
 
 
@@ -72,6 +70,8 @@ def read_frame(frame):
     """
     frame = np.frombuffer(frame, dtype=np.uint8)
     frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+
+    check_posture(frame)
 
 
 

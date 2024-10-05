@@ -1,6 +1,7 @@
 import os
 import re
 import urllib
+import json
 
 from bs4 import BeautifulSoup, Comment
 from typing import List, Tuple
@@ -9,13 +10,17 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import StaleElementReferenceException
+
+from gpt import Gpt
 
 
 class Scraper:
-    def __init__(self, client):
-        self.client = client
-        self.driver = webdriver.Chrome()
+    def __init__(self):
+        options = Options()
+        # options.add_argument('--headless=new')
+        self.driver = webdriver.Chrome(options=options)
 
     def get_contents(self, company, position) -> List[str]:
         """
@@ -26,9 +31,19 @@ class Scraper:
 
         html_contents: List[Tuple[str, str, str]] = []
         try:
-            results = WebDriverWait(self.driver, 10).until(
-                EC.visibility_of_all_elements_located((By.XPATH, '(//h3)[position() <= 5]'))
+            search = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.ID, "search"))
             )
+
+            print("Found search", search)
+
+            # Somehow doesn't work???
+
+            # results = WebDriverWait(self.driver, 10).until(
+            #     EC.visibility_of_all_elements_located((By.XPATH, '(//h3)[position() <= 5]'))
+            # )
+
+            results = self.driver.find_elements(By.XPATH, '(//h3)[position() <= 5]')
 
             links: List[Tuple[str, str]] = []
             for result in results:
@@ -97,68 +112,42 @@ class Scraper:
         self.driver.quit()
 
         return final_output_contents
-    
-    def gen_questions(self, company, position, n, all_contents):
-        prompt = """
-        Given a text dump of a composite of the five top sites for providing information for interviewing at a COMPANY for a ROLE, generate a list of N interview questions tailored to the company role based on the provided text information in the following format:
-
-        {
-            "questions": [
-                1: "Generic example: Why do you want to work at Microsoft?",
-                2: "Generic example: When did you start programming?",
-                ...
-            ]
-        }
-
-        Provide only the above JSON and nothing else.
-        """
-
-        user_prompt = f"""
-        COMPANY: {company}
-        ROLE: {position}
-        TEXT DUMP: {all_contents[0]}
-        """
-
-        response = self.client.chat.completions.create(
-            messages=[{
-                "role": "system",
-                "content": prompt
-            }, {
-                "role": "user",
-                "content": user_prompt
-            }],
-            model="gpt-4o-mini"
-        )
-
-        completion = response.choices[0].message.content
-        print(completion)
-        with open("openai_response.txt", "w") as f:
-            f.write(completion)
-
 
 if __name__ == "__main__":
     from dotenv import load_dotenv
 
     load_dotenv()
-    driver = webdriver.Chrome()
 
     company = "shopify"
-    position = "software engineering"
+    position = "qa"
+
+    n = 5
 
     client = OpenAI(
         api_key = os.environ.get("OPENAI_API_KEY"),
         organization = os.environ.get("OPENAI_ORGANIZATION")
     )
 
-    scraper = Scraper(client)
+    scraper = Scraper()
     
     all_contents = scraper.get_contents(company, position)
 
-    print("ALL CONTENTS: ", all_contents)
+    gpt = Gpt(client)
 
-    print("\n\n\nFirst one\n\n\n", all_contents[0], '\nlength', len(all_contents[0]))
+    output = gpt.gen_questions(company, position, n, '\n\n'.join(all_contents))
 
-    n = 5
+    print("JSON output:\n", output)
+    print(len(output["questions"]))
 
-    scraper.gen_questions(company, position, n, all_contents[0])
+
+    # interviewer pipeline
+
+    question = output["questions"][0]
+
+    response = input(question)
+
+    score = gpt.score(company, position, output["summary"], question, response)
+
+    print("Score:", score)
+
 

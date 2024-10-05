@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 const Room = () => {
 	const { roomId } = useParams();
-	const [message, setMessage] = useState('');
+	const [message, setMessage] = useState("");
 	const [messages, setMessages] = useState([]);
-	const [clientId] = useState(uuidv4());  // Generate unique client ID once
+	const [clientId] = useState(uuidv4()); // Generate unique client ID once
 	const [socket, setSocket] = useState(null);
 
-	const ran = useRef(false); 
-  
+	const ran = useRef(false);
+
 	useEffect(() => {
 		if (!ran.current) {
 			// Establish WebSocket connection to FastAPI
@@ -37,7 +37,7 @@ const Room = () => {
 						break; 
 				}
 			};
-			ran.current = true; 
+			ran.current = true;
 		}
 		return () => {
 			// Clean up WebSocket connection on component unmount
@@ -58,7 +58,7 @@ const Room = () => {
 		setMessage('');  // Clear the message input after sending
 	  }
 	};
-  
+
 	return (
 	  <div>
 		<h2>Room: {roomId}</h2>

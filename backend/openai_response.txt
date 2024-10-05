@@ -1,16 +1,1 @@
-```json
-{
-    "questions": [
-        1: "Why do you want to work at Shopify?",
-        2: "Can you describe a system you've previously designed or worked on?",
-        3: "Design a URL shortener in any programming language.",
-        4: "How do you go about implementing an LRU Cache and what considerations would you take into account for production-ready code?",
-        5: "Describe a library system's design you might build from scratch.",
-        6: "What is your personal journey in becoming a software engineer?",
-        7: "Explain how you would approach a pair programming exercise where the goal is to build a game like Wordle.",
-        8: "What steps would you take to ensure the robustness of code in a production environment during a coding task?",
-        9: "Discuss a time when you adjusted your usual coding practices to accommodate a different testing strategy suggested during an interview.",
-        10: "How have your personal and professional projects influenced your software development skills?"
-    ]
-}
-```
+65
