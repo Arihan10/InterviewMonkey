@@ -54,8 +54,8 @@ const roundsObject = [
   },
 ];
 
-const roundTime = 2; // 60 seconds for question round
-const breakTime = 1; // 30 seconds for break
+const roundTime = 5; // 60 seconds for question round
+const breakTime = 3; // 30 seconds for break
 
 const Room = () => {
   const [roomStarted, setRoomStarted] = useState(false);
@@ -71,7 +71,7 @@ const Room = () => {
   const { setQuestions, setSummary, questions, summary } =
     useQuestionSummaryStore();
   const accent = useAccentStore((state) => state.accent);
-  const { addRound, addUserToRound, rounds } = useRoundStore();
+  const { addRound, addUserToRound, rounds, setRounds } = useRoundStore();
   const { room } = useRoomStore();
 
   const handleNextRound = () => {
@@ -87,7 +87,6 @@ const Room = () => {
 
   const handleBreak = (newIsBreak) => {
     if (isSetting && isSetting.current) return;
-    console.log("is called");
     isSetting.current = true;
     setIsBreak(newIsBreak);
     if (newIsBreak) {
@@ -116,6 +115,9 @@ const Room = () => {
 
   const endRoom = () => {
     setRoomStarted(false);
+	setCurrentRound(-1);
+	setIsBreak(false);
+	setTimeRemaining(roundTime);
     console.log("Room ended. Rounds:", rounds);
   };
 
@@ -162,7 +164,8 @@ const Room = () => {
     setSummary(summary);
 
     setRoomStarted(true);
-    setCurrentRound(0);
+	setRounds([])
+	setCurrentRound(0);
     addRound(0);
   };
 

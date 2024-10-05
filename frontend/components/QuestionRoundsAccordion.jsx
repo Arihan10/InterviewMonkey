@@ -15,7 +15,7 @@ export function QuestionRoundsAccordion() {
 	return (
 		<Accordion type='single' collapsible className='w-full'>
 			{roundsObject.map((round, index) => (
-				<AccordionItem key={index} value={`item-${index}`}>
+				<AccordionItem key={index} value={`item-${index}`} className={!round.users.length && "hidden"}>
 					<AccordionTrigger>
 						<div className='flex'>
 							<span className='w-5'>
