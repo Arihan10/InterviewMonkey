@@ -109,14 +109,6 @@ async def grade(company: str, position: str, summary: str, question: str, respon
     # score is a string
     return score
 
-@app.post("/feedback")
-async def feedback(company: str, position: str, summary: str, question: str, self_response: str, self_score: str, other_responses: List[str], other_scores: List[str]):
-    gpt = Gpt(client)
-
-    feedback = gpt.feedback(company, position, summary, question, self_response, self_score, other_responses, other_scores)
-
-    return feedback
-
 server.set_manager(manager)
 
 async def startup_event():
