@@ -9,6 +9,8 @@ app = FastAPI()
 
 asyncQueue = asyncio.Queue()
 
+server = Server(asyncQueue=asyncQueue)
+
 # CORS middleware to allow React app to communicate with FastAPI
 app.add_middleware(
     CORSMiddleware,
@@ -27,6 +29,7 @@ class ConnectionManager:
         await websocket.accept()
         if room not in self.active_connections:
             self.active_connections[room] = []
+            server.open_room(room)
         self.active_connections[room].append(websocket)
 
     def disconnect(self, websocket: WebSocket, room: str):
@@ -54,7 +57,7 @@ async def websocket_endpoint(websocket: WebSocket, room: str):
     except WebSocketDisconnect:
         manager.disconnect(websocket, room)
 
-server = Server(asyncQueue=asyncQueue, manager=manager)
+server.set_manager(manager)
 
 async def startup_event():
     asyncio.create_task(server.run())

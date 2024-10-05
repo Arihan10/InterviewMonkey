@@ -1,26 +1,39 @@
 import os
 from openai import OpenAI
 
-# from scraper import Scraper
-# from reader import Reader
-# from interviewer import Interviewer
+from scraper import Scraper
+from gpt import Gpt
+from interviewer import Interviewer
 
 import asyncio
 
 
 class Server:
-    def __init__(self, asyncQueue: asyncio.Queue, manager):
+    def __init__(self, asyncQueue: asyncio.Queue):
         self.asyncQueue = asyncQueue
+
+        self.client = OpenAI(
+            api_key = os.environ.get("OPENAI_API_KEY"),
+            organization = os.environ.get("OPENAI_ORGANIZATION")
+        )
+
+        self.scraper = Scraper()
+        self.gpt = Gpt(self.client)
+        self.interviewer = Interviewer(self.client)
+
+        self.rooms = {}
+
+    def set_manager(self, manager):
         self.manager = manager
 
-        # self.client = OpenAI(
-        #     api_key = os.environ.get("OPENAI_API_KEY"),
-        #     organization = os.environ.get("OPENAI_ORGANIZATION")
-        # )
+    def open_room(self, room):
+        self.rooms[room] = {
+            "id": room,
+            "clients": []
+        }
 
-        # self.scraper = Scraper()
-        # self.reader = Reader(self.client)
-        # self.interviewer = Interviewer(self.client)
+    def close_room(self, room):
+        del self.rooms
 
     async def run(self):
         print("running")
