@@ -6,3 +6,5 @@ const useQuestionSummaryStore = create((set) => ({
 	setQuestions: (questions) => set({ questions }),
 	setSummary: (summary) => set({ summary }),
 }));
+
+export default useQuestionSummaryStore;

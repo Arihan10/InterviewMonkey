@@ -52,9 +52,9 @@ const Create = () => {
 		// HERE
 		// HERE
 		// HERE
-		router.push(`/testroom`);
+		// router.push(`/testroom`);
 		// Uncomment this when testing is done
-		// router.push(`/room/${newRoom}`);
+		router.push(`/room/room/${newRoom}`);
 	};
 
 	return (
