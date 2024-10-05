@@ -19,7 +19,7 @@ from gpt import Gpt
 class Scraper:
     def __init__(self):
         options = Options()
-        # options.add_argument('--headless=new')
+        options.add_argument('--headless=new')
         self.driver = webdriver.Chrome(options=options)
 
     def get_contents(self, company, position) -> List[str]:
