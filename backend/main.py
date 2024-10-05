@@ -2,14 +2,25 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 import json
 import asyncio
+import os
+from typing import List
 
+from openai import OpenAI
+
+from gpt import Gpt
 from server import Server
+from scraper import Scraper
 
 app = FastAPI()
 
 asyncQueue = asyncio.Queue()
 
 server = Server(asyncQueue=asyncQueue)
+
+client = OpenAI(
+    api_key = os.environ.get("OPENAI_API_KEY"),
+    organization = os.environ.get("OPENAI_ORGANIZATION")
+)
 
 # CORS middleware to allow React app to communicate with FastAPI
 app.add_middleware(
@@ -65,7 +76,7 @@ async def create_room(room: str, company: str = "Shopify", position: str = "Soft
     return {
         "room": await server.get_room(room),
         "client_id": client_id
-        }
+    }
 
 @app.get("/join/{room}")
 async def join_room(room: str, name: str = "Guest"):
@@ -73,8 +84,30 @@ async def join_room(room: str, name: str = "Guest"):
     return {
         "room": await server.get_room(room),
         "client_id": client_id
-        }
+    }
 
+@app.post("/questions")
+async def questions(company: str, position: str, n: int):
+
+    scraper = Scraper()
+    
+    all_contents = scraper.get_contents(company, position)
+
+    gpt = Gpt(client)
+
+    output = gpt.gen_questions(company, position, n, '\n\n'.join(all_contents))
+
+    # json return
+    return output
+
+@app.post("/grade")
+async def grade(company: str, position: str, summary: str, question: str, response: str):
+    gpt = Gpt(client)
+
+    score = gpt.score(company, position, summary, question, response)
+
+    # score is a string
+    return score
 
 server.set_manager(manager)
 
