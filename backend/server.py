@@ -22,6 +22,10 @@ class Server:
         # self.reader = Reader(self.client)
         # self.interviewer = Interviewer(self.client)
 
+if __name__ == "__main__":
+    from dotenv import load_dotenv
+
+    load_dotenv()
 
     async def run(self):
         print("running")
