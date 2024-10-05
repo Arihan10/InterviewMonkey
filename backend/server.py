@@ -19,3 +19,5 @@ class Server:
         self.interviewer = Interviewer(self.client)
 
 
+    def run(self, message, room):
+        pass
