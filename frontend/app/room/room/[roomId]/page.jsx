@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import VideoStream from "@/components/VideoStream";
 import Image from "next/image";
 import { TypographyH3 } from "@/components/ui/typo/TypographyH3";
@@ -13,6 +13,7 @@ import { getCompanyLogo } from "@/lib/utils";
 import { QuestionRoundsAccordion } from "@/components/QuestionRoundsAccordion";
 import { Button } from "@/components/ui/button";
 import useQuestionSummaryStore from "@/stores/questionsStore";
+import useRoundStore from "@/stores/roundStore";
 
 const roundsObject = [
 	{
@@ -60,20 +61,44 @@ const Room = () => {
 	const [timeRemaining, setTimeRemaining] = useState(roundTime); // 60 seconds for question round
 	const [isBreak, setIsBreak] = useState(false); // Tracks if it's break time
 
+	const advanced = useRef(false);
+
 	const state = useRoomStore();
 	const router = useRouter();
 
 	const { setQuestions, setSummary, questions, summary } =
 		useQuestionSummaryStore();
 	const accent = useAccentStore((state) => state.accent);
+	const { addRound, addUserToRound, rounds } = useRoundStore();
+	const { room } = useRoomStore();
 
 	const handleNextRound = () => {
-		//TODO:send to backend to rate
-		const rating = 4;
-		
+		setCurrentRound(currentRound + 1);
+		addRound(currentRound + 1);
+	};
 
-		setCurrentRound((prevRound) => prevRound + 1);
-		
+	useEffect(() => {
+		console.log(rounds);
+	}, [rounds]);
+
+	const handleBreak = (newIsBreak) => {
+		setIsBreak(newIsBreak);
+		if (newIsBreak) {
+			advanced.current = false;
+			//TODO:send to backend to rate
+			//HERE
+			//HERE
+			//HERE
+			const rating = 4;
+
+			console.log(currentRound);
+			addUserToRound(currentRound, {
+				userId: 0,
+				name: room.user,
+				rating: rating,
+				answer: "I want to work at shopify because it is a great company. They have a great culture and I want to be a part of it. I also love the products they make and I think I can contribute to the company in a positive way.",
+			});
+		}
 	};
 
 	// Timer useEffect to handle question and break intervals
@@ -86,9 +111,10 @@ const Room = () => {
 					if (prev === 1) {
 						// If time reaches zero, switch between round and break
 						const newIsBreak = !isBreak;
-						setIsBreak(newIsBreak);
+						handleBreak(newIsBreak);
 
-						if (!newIsBreak) {
+						if (!newIsBreak && !advanced.current) {
+							advanced.current = true;
 							handleNextRound(); // Move to next round
 						}
 
@@ -110,6 +136,8 @@ const Room = () => {
 			"Why do you want to work at shopify?",
 			"What is your favorite color?",
 			"question 3",
+			"question 4",
+			"question 5",
 		];
 		const summary =
 			"Super.com is a company that is known for its great culture and amazing products.";
@@ -119,6 +147,7 @@ const Room = () => {
 
 		setRoomStarted(true);
 		setCurrentRound(0);
+		addRound(0);
 	};
 
 	return (
@@ -165,7 +194,7 @@ const Room = () => {
 						<TypographyH3>
 							{isBreak
 								? "Break Time"
-								: questions[currentRound / 2] ||
+								: questions[currentRound] ||
 								  "No more questions"}
 						</TypographyH3>
 					</div>
@@ -180,9 +209,7 @@ const Room = () => {
 									{state.room.roomId}
 								</span>
 							</TypographyH3>
-							<QuestionRoundsAccordion
-								roundsObject={roundsObject}
-							/>
+							<QuestionRoundsAccordion roundsObject={rounds} />
 						</>
 					) : (
 						<div className='space-y-4'>

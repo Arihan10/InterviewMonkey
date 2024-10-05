@@ -29,6 +29,7 @@ function CardWithForm({ setName, setRoom }) {
 							<Label htmlFor='name'>Your Name</Label>
 							<Input
 								id='name'
+								autoComplete='one-time-code'
 								placeholder='Arihan Sharma'
 								setValue={setName}
 							/>
@@ -37,6 +38,7 @@ function CardWithForm({ setName, setRoom }) {
 							<Label htmlFor='room'>Room Name</Label>
 							<Input
 								id='room'
+								autoComplete='one-time-code'
 								placeholder='Shopify Room'
 								setValue={setRoom}
 							/>
