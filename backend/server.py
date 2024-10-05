@@ -74,6 +74,7 @@ class Server:
             message_data, room = await self.asyncQueue.get()
 
             # parse message
+            client_id = message_data.get("client_id")
             message = message_data.get("message")
             type = message_data.get("type")
 
