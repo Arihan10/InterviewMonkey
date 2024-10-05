@@ -1,15 +1,12 @@
-# from app import app
-
-# if __name__ == "__main__":
-#     import uvicorn
-#     uvicorn.run(app, host = "localhost", port = 5000)
-
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 import json
-import asyncio
+
+from server import Server
 
 app = FastAPI()
+
+server = Server()
 
 # CORS middleware to allow React app to communicate with FastAPI
 app.add_middleware(
@@ -56,7 +53,7 @@ async def websocket_endpoint(websocket: WebSocket, room: str):
             client_id = message_data.get("clientId")
             message = message_data.get("message")
 
-            asyncQueue.put(message)
+            # server run
 
             # Format the broadcast message with client ID
             broadcast_message = f"Client {client_id} says: {message}"
