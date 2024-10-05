@@ -63,26 +63,9 @@ const Room = () => {
 	  <div>
 		<h2>Room: {roomId}</h2>
 		<div>
-<<<<<<< HEAD
-			<h2>Room: {roomId}</h2>
-			<div>
-				{messages.map((msg, index) => (
-					<p key={index}>{msg}</p>
-				))}
-			</div>
-			<input
-				type='text'
-				autoComplete="one-time-code"
-				value={message}
-				onChange={(e) => setMessage(e.target.value)}
-				placeholder='Type a message'
-			/>
-			<button onClick={handleSendMessage}>Send</button>
-=======
 		  {messages.map((msg, index) => (
 			<p key={index}>{msg}</p>
 		  ))}
->>>>>>> 0ef19566d91963de8947ada4ae199d86ecdb20be
 		</div>
 		<input
 		  type="text"
