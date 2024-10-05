@@ -33,13 +33,10 @@ def analyze_posture(landmarks):
     shoulder_width = distance(left_shoulder, right_shoulder)
     head_width = distance(left_ear, right_ear)
 
-    if abs(180 - abs(shoulder_angle)) > 10:
-        #print(shoulder_angle)
-        pass
-
-    if abs(180 - abs(head_angle)) > 5:
-        #print(head_angle)
-        pass
+    
+    # [True, False] shoulders aligned, head aligned
+    return [abs(180 - abs(shoulder_angle)) < 10, abs(180 - abs(head_angle)) > 5]
+    
 
 
 def check_posture(frame):
@@ -53,7 +50,9 @@ def check_posture(frame):
 
     if results.pose_landmarks:
         mp.solutions.drawing_utils.draw_landmarks(frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
-        analyze_posture(results.pose_landmarks.landmark)
+        return analyze_posture(results.pose_landmarks.landmark)
+
+    
 
 # detector = FER()
 
@@ -65,13 +64,14 @@ def check_posture(frame):
 
 
 
-
 def read_frame(frame):
     """
     Process the frame and return the results
     """
     frame = np.frombuffer(frame, dtype=np.uint8)
     frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+
+    check_posture(frame)
 
 
 
