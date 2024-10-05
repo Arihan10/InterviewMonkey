@@ -16,7 +16,6 @@ const Room = () => {
 	useEffect(() => {
 		if (!ran.current) {
 			// Establish WebSocket connection to FastAPI
-
 			const socket = new WebSocket(`ws://localhost:8000/ws/${roomId}`);
 			setSocket(socket);
 
@@ -25,10 +24,9 @@ const Room = () => {
 				setMessages((prev) => [...prev, event.data]);
 			};
 			ran.current = true; 
-	
-			// Clean up WebSocket connection on component unmount
 		}
 		return () => {
+			// Clean up WebSocket connection on component unmount
 			if (ran.current && socket) {
 				socket.close();
 			}

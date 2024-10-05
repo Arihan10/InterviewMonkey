@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import mediapipe as mp
+from fer import FER
 
 mp_pose = mp.solutions.pose
 pose = mp_pose.Pose(static_image_mode=True, min_detection_confidence=0.5)
@@ -53,15 +54,16 @@ def check_posture(frame):
     if results.pose_landmarks:
         mp.solutions.drawing_utils.draw_landmarks(frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
         analyze_posture(results.pose_landmarks.landmark)
-        
-    
 
 
 def check_facial_expressions(frame):
     """
     Check the facial expressions of the interviewee
     """
-    pass
+    detector = FER()
+    print(detector.top_emotion(frame))
+
+
 
 
 def read_frame(frame):
@@ -79,7 +81,7 @@ if __name__ == "__main__":
     while True:
         ret, frame = cap.read()
         check_posture(frame)
-        # check_facial_expressions(frame)
+        #check_facial_expressions(frame) # facial expression analysis is very slow and laggy
 
         cv2.imshow("Posture", frame)
 
