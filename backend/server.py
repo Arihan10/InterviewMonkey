@@ -26,11 +26,23 @@ class Server:
     def set_manager(self, manager):
         self.manager = manager
 
-    def open_room(self, room):
+    def open_room(self, room, company, room_name, name, max_people, max_questions):
         self.rooms[room] = {
-            "id": room,
-            "clients": []
+            "room": room,
+            "clients": [],
+            "company": company,
+            "room_name": room_name,
+            "max_people": max_people,
+            "max_questions": max_questions
         }
+        self.join_room(room, name)
+
+    def join_room(self, room, client):
+        self.rooms[room]["clients"].append(client)
+
+    def get_room(self, room):
+        # modify data so that the entire room data isnt sent but just what the user needs to see
+        return self.rooms.get(room)
 
     def close_room(self, room):
         del self.rooms

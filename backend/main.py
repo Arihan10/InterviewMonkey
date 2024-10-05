@@ -29,7 +29,6 @@ class ConnectionManager:
         await websocket.accept()
         if room not in self.active_connections:
             self.active_connections[room] = []
-            server.open_room(room)
         self.active_connections[room].append(websocket)
 
     def disconnect(self, websocket: WebSocket, room: str):
@@ -56,6 +55,17 @@ async def websocket_endpoint(websocket: WebSocket, room: str):
             await asyncQueue.put((message_data, room))
     except WebSocketDisconnect:
         manager.disconnect(websocket, room)
+
+@app.post("/create/{room}")
+async def create_room(room: str, company: str = "Shopify", room_name: str = "", name: str = "Guest", max_people: int = 2, max_questions: int = 5):
+    server.open_room(room, company, room_name, name, max_people, max_questions)
+    return {"room": server.get_room(room)}
+
+@app.get("/join/{room}")
+async def join_room(room: str, name: str = "Guest"):
+    server.join_room(room, name)
+    return {"room": server.get_room(room)}
+
 
 server.set_manager(manager)
 
