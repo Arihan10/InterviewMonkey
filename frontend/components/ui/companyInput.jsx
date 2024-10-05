@@ -49,6 +49,7 @@ const Input = React.forwardRef(
 				)}
 				<input
 					onChange={handleChange1}
+					autoComplete="one-time-code"
 					type={type}
 					ref={ref}
 					{...props}

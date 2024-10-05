@@ -54,6 +54,7 @@ const Room = () => {
 			</div>
 			<input
 				type='text'
+				autoComplete="one-time-code"
 				value={message}
 				onChange={(e) => setMessage(e.target.value)}
 				placeholder='Type a message'

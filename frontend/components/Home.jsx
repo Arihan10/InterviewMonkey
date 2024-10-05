@@ -24,6 +24,7 @@ const Home = () => {
 			<button onClick={handleCreateRoom}>Create Room</button>
 			<input
 				type='text'
+				autoComplete="one-time-code"
 				value={room}
 				onChange={(e) => setRoom(e.target.value)}
 				placeholder='Enter Room ID'
