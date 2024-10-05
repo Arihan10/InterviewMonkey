@@ -1,6 +1,7 @@
 import os
 import re
 import urllib
+import json
 
 from bs4 import BeautifulSoup, Comment
 from typing import List, Tuple
@@ -100,12 +101,15 @@ class Scraper:
     
     def gen_questions(self, company, position, n, all_contents):
         prompt = """
-        Given a text dump of a composite of the five top sites for providing information for interviewing at a COMPANY for a ROLE, generate a list of N interview questions tailored to the company role based on the provided text information in the following format:
+        Given a text dump of a composite of the five top sites for providing information for interviewing at a COMPANY for a ROLE, you will generate a list of N interview questions tailored to the company role based on the provided text information, and generate a specific summary of the type of responses and behaviour the company expects from the candidate during the interview. 
+
+        You will provide a response in the following JSON format:
 
         {
+            "summary": "[summary]",
             "questions": [
-                1: "Generic example: Why do you want to work at Microsoft?",
-                2: "Generic example: When did you start programming?",
+                "Generic example: Why do you want to work at Microsoft?",
+                "Generic example: When did you start programming?",
                 ...
             ]
         }
@@ -116,8 +120,11 @@ class Scraper:
         user_prompt = f"""
         COMPANY: {company}
         ROLE: {position}
-        TEXT DUMP: {all_contents[0]}
+        TEXT DUMP: {all_contents}
+        N: {n}
         """
+
+        print("User prompt: ", user_prompt)
 
         response = self.client.chat.completions.create(
             messages=[{
@@ -131,16 +138,19 @@ class Scraper:
         )
 
         completion = response.choices[0].message.content
+
+        completion = completion.strip().lstrip("```json").rstrip("```")
+
         print(completion)
         with open("openai_response.txt", "w") as f:
             f.write(completion)
 
+        return json.loads(completion)
 
 if __name__ == "__main__":
     from dotenv import load_dotenv
 
     load_dotenv()
-    driver = webdriver.Chrome()
 
     company = "shopify"
     position = "software engineering"
@@ -154,11 +164,22 @@ if __name__ == "__main__":
     
     all_contents = scraper.get_contents(company, position)
 
-    print("ALL CONTENTS: ", all_contents)
-
-    print("\n\n\nFirst one\n\n\n", all_contents[0], '\nlength', len(all_contents[0]))
-
     n = 5
 
-    scraper.gen_questions(company, position, n, all_contents[0])
+    output = scraper.gen_questions(company, position, n, '\n\n'.join(all_contents))
+    print("JSON output:\n", output)
+    print(len(output["questions"]))
+
+    prompt = """
+"""
+
+    client.chat.completions.create(
+        messages=[{
+            "role": "system",
+            "content": prompt
+        }, {
+            "role": "user",
+            "content": user_prompt
+        }]
+    )
 
