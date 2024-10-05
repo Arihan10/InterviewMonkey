@@ -10,6 +10,7 @@ const Room = () => {
 	const [messages, setMessages] = useState([]);
 	const [clientId] = useState(uuidv4()); // Generate unique client ID once
 	const [socket, setSocket] = useState(null);
+	const [interviewStarted, setInterviewStarted] = useState(false); 
 
 	const ran = useRef(false);
 
@@ -32,6 +33,9 @@ const Room = () => {
 					case 'rating':
 						setMessages((prev) => [...prev, `Rating: ${data.message}`]);
 						break;
+					case 'event':
+						setMessages((prev) => [...prev, `Event: ${data.message}`]);
+						setInterviewStarted(true); 
 					default: 
 						setMessages((prev) => [...prev, `Unhandled Type: ${data.message}`]); 
 						break; 
@@ -62,19 +66,28 @@ const Room = () => {
 	return (
 	  <div>
 		<h2>Room: {roomId}</h2>
-		<div>
-		  {messages.map((msg, index) => (
-			<p key={index}>{msg}</p>
-		  ))}
-		</div>
-		<input
-		  type="text"
-		  value={message}
-		  onChange={(e) => setMessage(e.target.value)}
-		  placeholder="Type a message"
-		/>
-		<button onClick={() => handleSendMessage('message')}>Send Message</button>
-		<button onClick={() => handleSendMessage('rating')}>Send Rating</button>
+
+		{!interviewStarted && (
+			<button onClick={() => handleSendMessage('event')}>Start Interview</button>
+		)}
+
+		{interviewStarted && (
+			<>
+			<div>
+				{messages.map((msg, index) => (
+					<p key={index}>{msg}</p>
+				))}
+				</div>
+				<input
+				type="text"
+				value={message}
+				onChange={(e) => setMessage(e.target.value)}
+				placeholder="Type a message"
+				/>
+				<button onClick={() => handleSendMessage('message')}>Send Message</button>
+				<button onClick={() => handleSendMessage('rating')}>Send Rating</button>
+			</>
+		)}
 	  </div>
 	);
 };
