@@ -55,7 +55,7 @@ const Room = () => {
 	  if (socket) {
 		const payload = {
 			type: type,
-			clientId: clientId, // Send the client's unique ID with the message
+			client_id: clientId, // Send the client's unique ID with the message
 			message: message
 		};
 		socket.send(JSON.stringify(payload));  // Send the payload as JSON

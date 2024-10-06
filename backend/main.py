@@ -45,9 +45,9 @@ class ConnectionManager:
             if client_id:
                 if client_id in self.active_connections[room]:
                     await self.active_connections[room][client_id].send_test(json_message)
-        else:
-            for connection in self.active_connections[room]:
-                await connection.send_text(json_message)
+            else:
+                for connection in self.active_connections[room]:
+                    await connection.send_text(json_message)
 
 manager = ConnectionManager()
 
