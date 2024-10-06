@@ -6,6 +6,8 @@ from typing import List
 
 from server import Server
 
+from pydantic import BaseModel
+
 app = FastAPI()
 
 asyncQueue = asyncio.Queue()
@@ -15,7 +17,7 @@ server = Server(asyncQueue=asyncQueue)
 # CORS middleware to allow React app to communicate with FastAPI
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React app origin
+    allow_origins=["*"],  # React app origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -81,20 +83,38 @@ async def join_room(room: str, name: str = "Guest"):
         "client_id": client_id
     }
 
-@app.post("/questions")
-async def questions(company: str, position: str, n: int):    
-    all_contents = server.get_contents(company, position)
+class QuestionItem(BaseModel):
+    company: str
+    position: str
+    n: int
 
-    output = server.gen_questions(company, position, n, '\n\n'.join(all_contents))
+@app.post("/questions")
+async def questions(item: QuestionItem):
+
+    print("Getting all contents")
+    all_contents = server.get_contents(item.company, item.position)
+
+    print("All contents fetched")
+
+    output = server.gen_questions(item.company, item.position, item.n, '\n\n'.join(all_contents))
+
+    print("Got output", output)
 
     # json return
     return output
 
+class GradeItem(BaseModel):
+    company: str
+    position: str
+    summary: str
+    question: str
+    response: str
+
 @app.post("/grade")
-async def grade(company: str, position: str, summary: str, question: str, response: str):
+async def grade(item: GradeItem):
+    output = server.gpt.score(item.company, item.position, item.summary, item.question, item.response)
 
-    output = server.gpt.score(company, position, summary, question, response)
-
+    # score is a string
     return output
 
 server.set_manager(manager)

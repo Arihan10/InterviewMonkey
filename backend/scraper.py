@@ -12,6 +12,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import StaleElementReferenceException
+from selenium.webdriver.chrome.service import Service
 
 from gpt import Gpt
 
@@ -20,14 +21,24 @@ class Scraper:
     def __init__(self):
         options = Options()
         options.add_argument('--headless=new')
-        self.driver = webdriver.Chrome(options=options)
+        options.add_argument("--window-size=1,1")
+
+        chrome_driver_path = "C:/Users/Ariha/Downloads/chromedriver-win64/chromedriver-win64/chromedriver.exe"
+
+        service = Service(executable_path=chrome_driver_path)
+
+        self.driver = webdriver.Chrome(options=options, service=service)
+
+        # self.driver = webdriver.Chrome(options=options)
 
     def get_contents(self, company, position) -> List[str]:
         """
         Scrape top 5 sites that provide interview questions
         """
         search_url = f"{company} {position} interview questions"
+        print("GETTING CONTENTS")
         self.driver.get(f"https://www.google.com/search?q={urllib.parse.quote_plus(search_url)}")
+        print("DRIVER GET SUCCESSFUL")
 
         html_contents: List[Tuple[str, str, str]] = []
         try:
@@ -101,15 +112,15 @@ class Scraper:
             output_dir = 'output'
             os.makedirs(output_dir, exist_ok=True)
 
-            with open(os.path.join(output_dir, f'{txt}.txt'), 'w') as f:
-                f.write(link + "\n")
-                f.write(final_content)
+            # with open(os.path.join(output_dir, f'{txt}.txt'), 'w') as f:
+            #     f.write(link + "\n")
+            #     f.write(final_content)
 
             print(f'Cleaned content saved to {os.path.join(output_dir, f"{txt}.txt")}')
 
             final_output_contents.append(final_content)
 
-        self.driver.quit()
+        # self.driver.quit()
 
         return final_output_contents
 

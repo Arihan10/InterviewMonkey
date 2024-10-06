@@ -3,6 +3,7 @@ import { create } from "zustand";
 const useRoomStore = create((set) => ({
 	room: {
 		company: "",
+		position: "",
 		maxParticipants: 0,
 		numQuestions: 0,
 		room: "",
@@ -18,6 +19,7 @@ const useRoomStore = create((set) => ({
 	setRoom: (room) => set({ room }),
 	setAllRoomDetails: ({
 		company,
+		position,
 		maxParticipants,
 		numQuestions,
 		room,
@@ -28,6 +30,7 @@ const useRoomStore = create((set) => ({
 			room: {
 				...state.room,
 				company,
+				position,
 				maxParticipants,
 				numQuestions,
 				room,

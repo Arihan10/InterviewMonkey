@@ -14,13 +14,13 @@ class Server:
     def __init__(self, asyncQueue: asyncio.Queue):
         self.asyncQueue = asyncQueue
 
-        # self.client = OpenAI(
-        #     api_key = os.environ.get("OPENAI_API_KEY"),
-        #     organization = os.environ.get("OPENAI_ORGANIZATION")
-        # )
+        self.client = OpenAI(
+            api_key = os.environ.get("OPENAI_API_KEY"),
+            organization = os.environ.get("OPENAI_ORGANIZATION")
+        )
 
-        # self.scraper = Scraper()
-        # self.gpt = Gpt(self.client)
+        self.scraper = Scraper()
+        self.gpt = Gpt(self.client)
         # self.interviewer = Interviewer(self.client)
 
     def set_manager(self, manager):
