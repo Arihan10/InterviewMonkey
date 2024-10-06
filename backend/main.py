@@ -77,7 +77,7 @@ async def recv_bin(websocket: WebSocket, room: str):
             with open("received_image.png", "wb") as f:
                 f.write(binary_data)
 
-            print(f"Image saved at: {"received_image.png"}")
+            # print(f"Image saved at: {"received_image.png"}")
     except WebSocketDisconnect:
         manager.disconnect(websocket, room)
 
@@ -112,7 +112,7 @@ async def websocket_endpoint(websocket: WebSocket, room: str):
 
                 message_data = json.loads(text_data)
 
-                print("message data", message_data)
+                # print("message data", message_data)
 
                 await asyncQueue.put((message_data, room))
                 # print(f"Received text data: {text_data}")
