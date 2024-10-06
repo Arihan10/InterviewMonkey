@@ -17,7 +17,6 @@ import useRoundStore from "@/stores/roundStore";
 import { useInterval } from "@/lib/useInterval";
 import { v4 as uuidv4 } from "uuid";
 import useWsStore from "@/stores/wsStore";
-import { useReactMediaRecorder } from "react-media-recorder";
 import usePostureStore from "@/stores/postureStore";
 import { useReactMediaRecorder } from "react-media-recorder";
 
@@ -26,83 +25,6 @@ import { set } from "zod";
 
 const roundTime = 5; // 60 seconds for question round
 const breakTime = 3; // 30 seconds for break
-
-async function webmToWav(audioBlob) {
-	const audioContext = new AudioContext();
-
-	// Convert Blob to ArrayBuffer for decoding
-	const arrayBuffer = await audioBlob.arrayBuffer();
-
-	// Decode WebM data to raw PCM using AudioContext
-	const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-
-	// Encode raw PCM data into WAV format
-	return encodeWav(audioBuffer);
-}
-
-function encodeWav(audioBuffer) {
-	const numOfChannels = audioBuffer.numberOfChannels;
-	const sampleRate = audioBuffer.sampleRate;
-	const format = 1; // 1 = PCM
-	const bitDepth = 16;
-
-	const result = interleaveChannels(audioBuffer, bitDepth);
-
-	const buffer = new ArrayBuffer(44 + result.length * 2); // WAV header + audio data
-	const view = new DataView(buffer);
-
-	// WAV file header
-	writeString(view, 0, "RIFF");
-	view.setUint32(4, 36 + result.length * 2, true);
-	writeString(view, 8, "WAVE");
-	writeString(view, 12, "fmt ");
-	view.setUint32(16, 16, true); // PCM chunk size
-	view.setUint16(20, format, true);
-	view.setUint16(22, numOfChannels, true);
-	view.setUint32(24, sampleRate, true);
-	view.setUint32(28, sampleRate * numOfChannels * 2, true); // Byte rate
-	view.setUint16(32, numOfChannels * 2, true); // Block align
-	view.setUint16(34, bitDepth, true); // Bits per sample
-	writeString(view, 36, "data");
-	view.setUint32(40, result.length * 2, true);
-
-	// Write interleaved audio data
-	let offset = 44;
-	for (let i = 0; i < result.length; i++, offset += 2) {
-		view.setInt16(offset, result[i], true);
-	}
-
-	return new Blob([view], { type: "audio/wav" });
-}
-
-function interleaveChannels(audioBuffer, bitDepth) {
-	const channelData = [];
-	const numOfChannels = audioBuffer.numberOfChannels;
-
-	// Extract channel data from audioBuffer
-	for (let channel = 0; channel < numOfChannels; channel++) {
-		channelData[channel] = audioBuffer.getChannelData(channel);
-	}
-
-	const length = audioBuffer.length;
-	const interleaved = new Int16Array(length * numOfChannels);
-
-	for (let sampleIndex = 0; sampleIndex < length; sampleIndex++) {
-		for (let channel = 0; channel < numOfChannels; channel++) {
-			interleaved[sampleIndex * numOfChannels + channel] =
-				Math.max(-1, Math.min(1, channelData[channel][sampleIndex])) *
-				0x7fff;
-		}
-	}
-
-	return interleaved;
-}
-
-function writeString(view, offset, string) {
-	for (let i = 0; i < string.length; i++) {
-		view.setUint8(offset + i, string.charCodeAt(i));
-	}
-}
 
 const Room = () => {
 	const { roomId } = useParams();
@@ -114,9 +36,14 @@ const Room = () => {
 	const [clientId] = useState(uuidv4());
 	// const [socket, setSocket] = useState(null);
 	const [messages, setMessages] = useState([]);
-	//const { ws: socket, setWs: setSocket } = useWsStore(); // remove? arihan
+	// const { ws, setWs } = useWsStore(); // remove? arihan
 	const [interviewStarted, setInterviewStarted] = useState(false);
 	const [socket, setSocket] = useState(null);
+	const [started, setStarted] = useState(false);
+
+	// useEffect(() => {
+	// 	setWs(socket);
+	// }, [socket]);
 
 	const advanced = useRef(false);
 
@@ -315,6 +242,7 @@ const Room = () => {
 		setCurrentRound(-1);
 		setIsBreak(false);
 		setTimeRemaining(roundTime);
+		setStarted(false);
 		console.log("Room ended. Rounds:", rounds);
 	};
 
@@ -347,6 +275,7 @@ const Room = () => {
 	);
 
 	const handleRoomStart = async () => {
+		setStarted(true);
 		console.log(
 			JSON.stringify({
 				company: room.company,
@@ -479,11 +408,12 @@ const Room = () => {
 							<QuestionRoundsAccordion />
 						</>
 					) : (
-						<div className='space-y-4'>
+						<div className='space-y-4 flex flex-col justify-center items-center'>
 							<TypographyH3>Start Room</TypographyH3>
-							<Button onClick={handleRoomStart}>
+							<Button onClick={handleRoomStart} disabled={started}>
 								Start Room
 							</Button>
+							<QuestionRoundsAccordion />
 						</div>
 					)}
 				</div>

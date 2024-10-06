@@ -22,9 +22,9 @@ export function QuestionRoundsAccordion() {
 								{index + 1}
 								{" | "}
 							</span>
-							{round.question.length > 50
-								? round.question.substring(0, 50) + "..."
-								: round.question}
+							{round?.question?.length > 50
+								? round?.question?.substring(0, 50) + "..."
+								: round?.question}
 						</div>
 					</AccordionTrigger>
 					<AccordionContent className='space-y-4'>

@@ -2,11 +2,17 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import useWsStore from "../stores/wsStore";
+import useTaskStore from "../stores/taskStore";
+// import { useAnimationLoop } from "../lib/useAnimationLoop";
 
 const VideoStream = () => {
 	const videoRef = useRef(null);
 	const { ws } = useWsStore();
 	const wsRef = useRef(ws);
+	const addTask = useTaskStore((state) => state.addTask);
+	const removeTask = useTaskStore((state) => state.removeTask);
+	// const { addTask } = useAnimationLoop();
+	// const lastRef = useRef(Date.now());
 
 	useEffect(() => {
 		async function startVideo() {
@@ -24,11 +30,15 @@ const VideoStream = () => {
 
 		startVideo();
 
-		// requestAnimationFrame(sendFrameToBackend);
+		addTask(sendFrameToBackend, 1000 / 5);
 
-		return () => {
+		// requestRef.current = requestIdleCallback(sendFrameToBackend);
 
-		};
+		return () => removeTask(sendFrameToBackend);
+
+		// return () => {
+		// 	cancelIdleCallback(requestRef.current);
+		// };
 	}, []);
 
 	useEffect(() => {
@@ -36,31 +46,37 @@ const VideoStream = () => {
 		wsRef.current = ws;
 	}, [ws, wsRef]);
 
-	const requestRef = useRef()
+	// const requestRef = useRef();
 
-	// const sendFrameToBackend = () => {
-	// 	const canvas = document.createElement("canvas");
-	// 	const context = canvas.getContext("2d");
-	// 	canvas.width = videoRef.current.videoWidth;
-	// 	canvas.height = videoRef.current.videoHeight;
-	// 	context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-	
-	// 	canvas.toBlob((blob) => {
-	// 		// console.log("Blob", blob);
-	// 		// console.log("socket", ws);
-	// 		// console.log("socket status", ws && ws.readyState)
-	// 		if (!wsRef.current) return;
-	// 		// console.log("Websocket is present")
-	// 		if (wsRef.current.readyState === WebSocket.OPEN) {
-	// 			// console.log("SENDING BLOB");
-	// 			wsRef.current.send(blob, { binary: true });
-	// 		}
-	// 	}, "image/jpeg");
+	const sendFrameToBackend = () => {
+		// if (Date.now() - lastRef.current < 1000 / 2) {
+		// 	requestRef.current = requestAnimationFrame(sendFrameToBackend);
+		// 	return;
+		// }
+		// lastRef.current = Date.now();
+		const canvas = document.createElement("canvas");
+		const context = canvas.getContext("2d");
+		canvas.width = videoRef.current.videoWidth;
+		canvas.height = videoRef.current.videoHeight;
+		context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
-	// 	setTimeout(() => {
-	// 		requestRef.current = requestAnimationFrame(sendFrameToBackend);
-	// 	}, 500);
-	// };
+		canvas.toBlob((blob) => {
+			// console.log("Blob", blob);
+			// console.log("socket", ws);
+			// console.log("socket status", ws && ws.readyState)
+			// console.log("current socket", wsRef.current);
+			if (!wsRef.current) return;
+			// console.log("Websocket is present");
+			if (wsRef.current.readyState === WebSocket.OPEN) {
+				// console.log("SENDING BLOB");
+				wsRef.current.send(blob, { binary: true });
+			}
+		}, "image/jpeg");
+
+		// setTimeout(() => {
+		// requestRef.current = requestIdleCallback(sendFrameToBackend);
+		// }, 500);
+	};
 
 	return (
 		<div className='absolute left-0 w-full'>

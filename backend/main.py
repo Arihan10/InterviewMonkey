@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from pydub import AudioSegment
 from io import BytesIO
 import speech_recognition as sr
+import openai
 
 app = FastAPI()
 
@@ -193,22 +194,38 @@ async def grade(
 
     wav_io = BytesIO(contents)
 
-    recognizer = sr.Recognizer()
-    text = ""
+    # recognizer = sr.Recognizer()
+    # text = ""
 
-    with sr.AudioFile(wav_io) as audio_file:
-        audio_data = recognizer.record(audio_file)
-        try:
-            text = recognizer.recognize_google(audio_data)
-        except sr.UnknownValueError:
-            text = "Speech not recognized"
-        except sr.RequestError as e:
-            text = f"Could not request results; {e}"
+    # with sr.AudioFile(wav_io) as audio_file:
+    #     audio_data = recognizer.record(audio_file)
+    #     try:
+    #         text = recognizer.recognize_google(audio_data)
+    #     except sr.UnknownValueError:
+    #         text = "Speech not recognized"
+    #     except sr.RequestError as e:
+    #         text = f"Could not request results; {e}"
     
-    print("Text", text)
+    # print("Text", text)
+
+    try:
+        wav_io.seek(0)
+        wav_io.name = "response.wav"
+        # audio_file = open("received_audio.wav", "rb")
+        transcription = openai.audio.transcriptions.create(
+            model="whisper-1",  # Choose the appropriate model, e.g., "whisper-1"
+            file=wav_io,
+            response_format="text"  # To get just the text response
+        )
+        text = transcription
+    except Exception as e:
+        text = f"An error occurred: {str(e)}"
+
+    print("transcription:", text)
 
     output = server.gpt.score(company, position, summary, question, text)
 
+    output["transcription"] = text
     # score is a string
     return output
 
