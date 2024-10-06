@@ -54,7 +54,7 @@ const Create = () => {
 		// HERE
 		// router.push(`/testroom`);
 		// Uncomment this when testing is done
-		router.push(`/room/room/${newRoom}`);
+		router.push(`/room/${newRoom}?mode=create`);
 	};
 
 	return (
