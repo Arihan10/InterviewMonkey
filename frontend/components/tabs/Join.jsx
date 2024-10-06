@@ -10,14 +10,14 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
 const Create = () => {
-	const [roomCode, setRoomCode] = useState("");
+	const [room, setRoom] = useState("");
 	const [name, setName] = useState("");
 
 	const router = useRouter();
 
 	const handleJoinRoom = () => {
 		if (room) {
-			router.push(`/room/${room}?mode=join`);
+			router.push(`/room/room/${room}?mode=join`);
 		}
 	};
 
@@ -51,8 +51,8 @@ const Create = () => {
 						placeholder={"ABCD1234"}
 						type={"text"}
 						buttonText={"Join Room"}
-						disabled={!roomCode}
-						setValue={setRoomCode}
+						disabled={!room}
+						setValue={setRoom}
 					/>
 				</form>
 			</div>

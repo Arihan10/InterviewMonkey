@@ -8,13 +8,14 @@ import { TypographyH2 } from "@/components/ui/typo/TypographyH2";
 import { TypographyP } from "@/components/ui/typo/TypographyP";
 import useRoomStore from "@/stores/roomStore";
 import useAccentStore from "@/stores/accentStore";
-import { useRouter } from "next/navigation";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { getCompanyLogo } from "@/lib/utils";
 import { QuestionRoundsAccordion } from "@/components/QuestionRoundsAccordion";
 import { Button } from "@/components/ui/button";
 import useQuestionSummaryStore from "@/stores/questionsStore";
 import useRoundStore from "@/stores/roundStore";
 import { useInterval } from "@/lib/useInterval";
+import { v4 as uuidv4 } from "uuid";
 
 const roundsObject = [
   {
@@ -58,10 +59,16 @@ const roundTime = 5; // 60 seconds for question round
 const breakTime = 3; // 30 seconds for break
 
 const Room = () => {
+  const { roomId } = useParams()
+  const searchParams = useSearchParams(); 
   const [roomStarted, setRoomStarted] = useState(false);
   const [currentRound, setCurrentRound] = useState(-1);
   const [timeRemaining, setTimeRemaining] = useState(roundTime); // 60 seconds for question round
   const [isBreak, setIsBreak] = useState(false); // Tracks if it's break time
+  const [clientId] = useState(uuidv4()); 
+  const [socket, setSocket] = useState(null);
+  const [message, setMessage] = useState("");
+	const [messages, setMessages] = useState([]);
 
   const advanced = useRef(false);
 
@@ -79,23 +86,92 @@ const Room = () => {
     addRound(currentRound + 1);
   };
 
-  //   useEffect(() => {
-  //     console.log(rounds);
-  //   }, [rounds]);
-
   const isSetting = useRef(false);
 
-  const handleBreak = (newIsBreak) => {
+  const ran = useRef(false); 
+
+  const mode = searchParams.get("mode"); 
+
+  useEffect(() => {
+    if (!ran.current) {
+      // Establish WebSocket connection to FastAPI
+
+      const socket = new WebSocket(`ws://localhost:8000/ws/${roomId}`);
+      setSocket(socket);
+
+      // Handle incoming messages from the server
+      socket.onmessage = (event) => {
+        console.log(event)
+
+        const data = JSON.parse(event.data); 
+
+        switch (data.type) {
+          case 'message': 
+            setMessages((prev) => [...prev, `Message: ${data.message}`]); 
+            break; 
+          case 'rating':
+            setMessages((prev) => [...prev, `Rating: ${data.message}`]);
+            break;
+          case 'event':
+            setMessages((prev) => [...prev, `Event: ${data.message}`]);
+            setInterviewStarted(true); 
+          default: 
+            setMessages((prev) => [...prev, `Unhandled Type: ${data.message}`]); 
+            break; 
+        }
+      };
+      ran.current = true;
+    }
+    return () => {
+      // Clean up WebSocket connection on component unmount
+      if (ran.current && socket) {
+        socket.close();
+      }
+    };
+  }, [roomId]);
+
+  const handleSendMessage = (type) => {
+    if (socket) {
+    const payload = {
+      type: type,
+      client_id: clientId, // Send the client's unique ID with the message
+      message: message
+    };
+    socket.send(JSON.stringify(payload));  // Send the payload as JSON
+    setMessage('');  // Clear the message input after sending
+    }
+  };
+
+  const handleBreak = async (newIsBreak) => {
     if (isSetting && isSetting.current) return;
     isSetting.current = true;
     setIsBreak(newIsBreak);
     if (newIsBreak) {
       advanced.current = false;
-      //TODO:send to backend to rate
-      //HERE
-      //HERE
-      //HERE
-      const rating = 4;
+      // TODO:send to backend to rate
+      // HERE
+      // HERE
+      // HERE
+      const res = await fetch("http://localhost:8000/grade", {
+        method: "POST",
+        headers: {
+          'Content-Type': "application/json"
+        },
+        body: JSON.stringify({
+          summary: summary,
+          company: room.company,
+          position: room.position,
+          question: questions[currentRound],
+          response: `My dad owns ${room.company}`,
+        })
+      })
+      const body = await res.json();
+
+      const rating = body.score / 20; 
+      // TODO: FIX STARS, ADD FEEDBACK
+      // HERE
+      // HERE
+      // HERE
 
       if (currentRound + 1 >= questions.length && roomStarted) {
         endRoom();
@@ -108,16 +184,16 @@ const Room = () => {
         name: room.user,
         rating: rating,
         answer:
-          "I want to work at shopify because it is a great company. They have a great culture and I want to be a part of it. I also love the products they make and I think I can contribute to the company in a positive way.",
+          `My dad owns ${room.company}`,
       });
     }
   };
 
   const endRoom = () => {
     setRoomStarted(false);
-	setCurrentRound(-1);
-	setIsBreak(false);
-	setTimeRemaining(roundTime);
+    setCurrentRound(-1);
+    setIsBreak(false);
+    setTimeRemaining(roundTime);
     console.log("Room ended. Rounds:", rounds);
   };
 
@@ -150,22 +226,31 @@ const Room = () => {
   );
 
   const handleRoomStart = async () => {
-    const questions = [
-      "Why do you want to work at shopify?",
-      "What is your favorite color?",
-      "question 3",
-      "question 4",
-      "question 5",
-    ];
-    const summary =
-      "Super.com is a company that is known for its great culture and amazing products.";
+    console.log(JSON.stringify({
+      company: room.company,
+      position: room.position,
+      n: room.numQuestions,
+    })); 
 
-    setQuestions(questions);
-    setSummary(summary);
+    const res = await fetch("http://localhost:8000/questions", {
+      method: "POST",
+      headers: {
+        'Content-Type': "application/json"
+      },
+      body: JSON.stringify({
+        company: room.company,
+        position: room.position,
+        n: room.numQuestions,
+      })
+    })
+    const body = await res.json();
+
+    setQuestions(body.questions);
+    setSummary(body.summary);
 
     setRoomStarted(true);
-	setRounds([])
-	setCurrentRound(0);
+    setRounds([])
+    setCurrentRound(0);
     addRound(0);
   };
 

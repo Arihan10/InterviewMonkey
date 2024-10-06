@@ -37,15 +37,13 @@ const Create = () => {
 	const router = useRouter();
 
 	const handleCreateRoom = () => {
-		const newRoom = Math.random().toString(36).substr(2, 9); // Generate a random room ID
-
 		setAllRoomDetails({
 			company,
+			position: role,
 			maxParticipants,
 			numQuestions,
 			room,
 			user,
-			roomId: newRoom,
 		});
 		//TODO: send room details to the backend here
 		// HERE
@@ -54,7 +52,7 @@ const Create = () => {
 		// HERE
 		// router.push(`/testroom`);
 		// Uncomment this when testing is done
-		router.push(`/room/${newRoom}?mode=create`);
+		router.push(`/room/room/${room}?mode=create`);
 	};
 
 	return (
