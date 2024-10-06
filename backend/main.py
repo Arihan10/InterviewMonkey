@@ -1,14 +1,15 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Form, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 import json
 import asyncio
-from typing import List
-
-import os
 
 from server import Server
 
 from pydantic import BaseModel
+from pydub import AudioSegment
+from io import BytesIO
+import speech_recognition as sr
 
 app = FastAPI()
 
@@ -160,16 +161,43 @@ async def questions(item: QuestionItem):
     # json return
     return output
 
-class GradeItem(BaseModel):
-    company: str
-    position: str
-    summary: str
-    question: str
-    response: str
+# class GradeItem(BaseModel):
+#     company: str
+#     position: str
+#     summary: str
+#     question: str
+#     response: str
 
 @app.post("/grade")
-async def grade(item: GradeItem):
-    output = server.gpt.score(item.company, item.position, item.summary, item.question, item.response)
+async def grade(
+    summary: str = Form(...),
+    company: str = Form(...),
+    position: str = Form(...),
+    question: str = Form(...),
+    response: UploadFile = File(...),
+):
+    contents = await response.read()
+
+    with open("received_audio.wav", "wb") as audio_file:
+        audio_file.write(contents)
+
+    wav_io = BytesIO(contents)
+
+    recognizer = sr.Recognizer()
+    text = ""
+
+    with sr.AudioFile(wav_io) as audio_file:
+        audio_data = recognizer.record(audio_file)
+        try:
+            text = recognizer.recognize_google(audio_data)
+        except sr.UnknownValueError:
+            text = "Speech not recognized"
+        except sr.RequestError as e:
+            text = f"Could not request results; {e}"
+    
+    print("Text", text)
+
+    output = server.gpt.score(company, position, summary, question, text)
 
     # score is a string
     return output
