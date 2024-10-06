@@ -17,6 +17,7 @@ import useRoundStore from "@/stores/roundStore";
 import { useInterval } from "@/lib/useInterval";
 import { v4 as uuidv4 } from "uuid";
 import useWsStore from "@/stores/wsStore";
+import { useReactMediaRecorder } from "react-media-recorder";
 import usePostureStore from "@/stores/postureStore";
 import { useReactMediaRecorder } from "react-media-recorder";
 
