@@ -43,28 +43,26 @@ class Server:
             message = message_data.get("message")
             type = message_data.get("type")
 
-            print(message)
+            json_message = {
+                "client_id": client_id,
+                "type": type,
+                "message": message,
+            }
+
+            print (json_message)
 
             # HAVE TYPE STUFF HERE
-            if (type == "message"):
-                json_message = {
-                    "client_id": client_id,
-                    "type": type,
-                    "message": message,
-                }
-                 
-                await self.manager.send_message(json_message, room)
-            elif (type == "answer"):
+            if (type == "answer"):
                 # handle
                 pass
-
-            # read, then process camera frame
-            if False:
+            elif (type == "frame"):
                 frame = None
                 # process frame here
                 score = self.interviewer.score_frame(frame)
                 broadcast_message = f"Posture {score[0]} {score[1]}"
                 await self.manager.send_message(broadcast_message, room)
+            else:
+                await self.manager.send_message(json_message, room)
 
             # print(message)
 
