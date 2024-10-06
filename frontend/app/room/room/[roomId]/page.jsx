@@ -5,6 +5,7 @@ import VideoStream from "@/components/VideoStream";
 import Image from "next/image";
 import { TypographyH3 } from "@/components/ui/typo/TypographyH3";
 import { TypographyH2 } from "@/components/ui/typo/TypographyH2";
+import { TypographyP } from "@/components/ui/typo/TypographyP";
 import useRoomStore from "@/stores/roomStore";
 import useAccentStore from "@/stores/accentStore";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
@@ -111,12 +112,9 @@ const Room = () => {
 	const [isBreak, setIsBreak] = useState(false); // Tracks if it's break time
 	const [clientId] = useState(uuidv4());
 	// const [socket, setSocket] = useState(null);
-	const [message, setMessage] = useState("");
 	const [messages, setMessages] = useState([]);
 	//const { ws: socket, setWs: setSocket } = useWsStore(); // remove? arihan
-	const [interviewStarted, setInterviewStarted] = useState(false);
 	const [socket, setSocket] = useState(null);
-
 
 	const advanced = useRef(false);
 
@@ -166,28 +164,28 @@ const Room = () => {
 				// console.log(event);
 
 				const data = JSON.parse(event.data);
-				if (data.includes("Posture")) {
-					//please partse "Posture true true" into an array
-					const result = data
-						.split(" ")
-						.filter((word) => word === "True" || word === "False")
-						.map((word) => word === "True");
+				// if (data.includes("Posture")) {
+				// 	//please partse "Posture true true" into an array
+				// 	const result = data
+				// 		.split(" ")
+				// 		.filter((word) => word === "True" || word === "False")
+				// 		.map((word) => word === "True");
 
-					console.log(result);
+				// 	console.log(result);
 
-					if (result[0] && result[1]) {
-						console.log("Posture is good");
-						if (cumSum > 0) setCumSum((prev) => prev - 1);
-					} else {
-						console.log("Posture is bad");
+				// 	if (result[0] && result[1]) {
+				// 		console.log("Posture is good");
+				// 		if (cumSum > 0) setCumSum((prev) => prev - 1);
+				// 	} else {
+				// 		console.log("Posture is bad");
 
-						if (cumSum < 100) setCumSum((prev) => prev + 3);
-					}
+				// 		if (cumSum < 100) setCumSum((prev) => prev + 3);
+				// 	}
 
-					if (result != posture) {
-						setPosture(result);
-					}
-				}
+				// 	if (result != posture) {
+				// 		setPosture(result);
+				// 	}
+				// }
 
 				switch (data.type) {
 					case "message":
@@ -207,7 +205,6 @@ const Room = () => {
 							...prev,
 							`Event: ${data.message}`,
 						]);
-						setInterviewStarted(true);
 
 						console.log("EVENT RECEIVED!")
 
@@ -215,7 +212,8 @@ const Room = () => {
 			
 						console.log(data.message)
 			
-						body = JSON.parse(data.message)
+						// body = JSON.parse(data.message)
+            body = data.message
 			
 						setQuestions(body["questions"])
 						setSummary(body["summary"])
@@ -369,7 +367,6 @@ const Room = () => {
 
 		handleSendMessage("event", body)
 
-
 		setQuestions(body.questions);
 		setSummary(body.summary);
 		startRecording();
@@ -379,12 +376,27 @@ const Room = () => {
 		addRound(0);
 	};
 
+  const handleSendMessage = (type, message) => {
+	  if (socket) {
+      const payload = {
+        type: type,
+        client_id: clientId, // Send the client's unique ID with the message
+        message: message
+      };
+		  socket.send(JSON.stringify(payload));  // Send the payload as JSON
+	  }
+	};
+
 	const handleInterviewStart = async () => {
 		setRoomStarted(true);
-			setRounds([]);
-			setCurrentRound(0);
-			addRound(0);
-	  }
+    setRounds([]);
+    setCurrentRound(0);
+    addRound(0);
+  }
+
+  useInterval(() => {
+    console.log("Socket status", socket?.readyState)
+  }, 1000, true, [])
 	
 
 	if (mode == "join" && !roomStarted) {
