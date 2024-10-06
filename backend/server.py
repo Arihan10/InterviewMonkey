@@ -1,6 +1,5 @@
 import os
 from openai import OpenAI
-from random import randint
 
 from scraper import Scraper
 from gpt import Gpt
@@ -24,23 +23,14 @@ class Server:
         # self.gpt = Gpt(self.client)
         # self.interviewer = Interviewer(self.client)
 
-        self.rooms = {}
-
     def set_manager(self, manager):
         self.manager = manager
 
-    # room structure:
-    """
-    {
-        room: str (id)
-        clients: list of (client id, client name)
-        company: str
-        position: str
-        room_name: str
-        max_people: int
-        max_questions: int
-    }
-    """
+    def get_contents(self, company, position):
+        return self.scraper.get_contents(company, position)
+    
+    def gen_questions(self, company, position, n, all_contents):
+        return self.gpt.gen_questions(company, position, n, all_contents)
 
     async def run(self):
         print("running")
@@ -53,20 +43,28 @@ class Server:
             message = message_data.get("message")
             type = message_data.get("type")
 
-            json_message = {
-                "client_id": client_id,
-                "type": type,
-                "message": message,
-            }
-
-            print (json_message)
+            print(message)
 
             # HAVE TYPE STUFF HERE
-            if (type == "answer"):
+            if (type == "message"):
+                json_message = {
+                    "client_id": client_id,
+                    "type": type,
+                    "message": message,
+                }
+                 
+                await self.manager.send_message(json_message, room)
+            elif (type == "answer"):
                 # handle
                 pass
-            else:
-                await self.manager.send_message(json_message, room)
+
+            # read, then process camera frame
+            if False:
+                frame = None
+                # process frame here
+                score = self.interviewer.score_frame(frame)
+                broadcast_message = f"Posture {score[0]} {score[1]}"
+                await self.manager.send_message(broadcast_message, room)
 
             # print(message)
 

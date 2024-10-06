@@ -1,7 +1,6 @@
 import { create } from "zustand";
 
 import useQuestionSummaryStore from "./questionsStore";
-import { use } from "react";
 
 const useRoundStore = create((set) => ({
 	rounds: [],
@@ -9,6 +8,7 @@ const useRoundStore = create((set) => ({
 	addRound: (roundIndex) =>
 		set((state) => ({
 			rounds: [
+				...state.rounds,
 				{
 					question:
 						useQuestionSummaryStore.getState().questions[
@@ -16,13 +16,21 @@ const useRoundStore = create((set) => ({
 						],
 					users: [],
 				},
-				...state.rounds,
 			],
 		})),
 	addUserToRound: (roundIndex, user) =>
 		set((state) => {
+			// console.log("Adding index", roundIndex, user);
 			const newRounds = [...state.rounds];
-			newRounds[roundIndex].users.push(user);
+			// newRounds[roundIndex].users.push(user);
+			newRounds[roundIndex] = {
+				...newRounds[roundIndex],
+				users: [
+					...newRounds[roundIndex].users,
+					user
+				]
+			};
+			// console.log("New round", newRounds);
 			return { rounds: newRounds };
 		}),
 }));

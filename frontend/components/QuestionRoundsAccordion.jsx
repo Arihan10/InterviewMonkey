@@ -8,12 +8,14 @@ import { TypographyP } from "./ui/typo/TypographyP";
 
 import Rating from "@/components/Rating";
 import { RoundDialog } from "@/components/RoundDialog";
+import useRoundStore from "@/stores/roundStore";
 
-export function QuestionRoundsAccordion({ roundsObject }) {
+export function QuestionRoundsAccordion() {
+	const { rounds: roundsObject } = useRoundStore();
 	return (
 		<Accordion type='single' collapsible className='w-full'>
 			{roundsObject.map((round, index) => (
-				<AccordionItem key={index} value={`item-${index}`}>
+				<AccordionItem key={index} value={`item-${index}`} className={!round.users.length && "hidden"}>
 					<AccordionTrigger>
 						<div className='flex'>
 							<span className='w-5'>
