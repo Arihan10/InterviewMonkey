@@ -9,12 +9,12 @@ const Home = () => {
 
 	const handleCreateRoom = () => {
 		// const newRoom = Math.random().toString(36).substr(2, 9); // Generate a random room ID
-		router.push(`/room/${room}`);
+		router.push(`/room/${room}?mode=create`);
 	};
 
 	const handleJoinRoom = () => {
 		if (room) {
-			router.push(`/room/${room}`);
+			router.push(`/room/${room}?mode=join`);
 		}
 	};
 
