@@ -16,7 +16,10 @@ import useRoundStore from "@/stores/roundStore";
 import { useInterval } from "@/lib/useInterval";
 import { v4 as uuidv4 } from "uuid";
 import useWsStore from "@/stores/wsStore";
-import { useReactMediaRecorder } from "react-media-recorder";
+import usePostureStore from "@/stores/postureStore";
+
+import Posture from "@/components/Posture";
+import { set } from "zod";
 
 const roundsObject = [
   {
@@ -147,17 +150,20 @@ const Room = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const { ws: socket, setWs: setSocket } = useWsStore();
+	const [interviewStarted, setInterviewStarted] = useState(false);
 
   const advanced = useRef(false);
 
   //   const state = useRoomStore();
   const router = useRouter();
 
-  const { setQuestions, setSummary, questions, summary } =
-    useQuestionSummaryStore();
-  const accent = useAccentStore((state) => state.accent);
-  const { addRound, addUserToRound, rounds, setRounds } = useRoundStore();
-  const { room } = useRoomStore();
+	const { setQuestions, setSummary, questions, summary } =
+		useQuestionSummaryStore();
+	const accent = useAccentStore((state) => state.accent);
+	const { addRound, addUserToRound, rounds, setRounds } = useRoundStore();
+	const { room } = useRoomStore();
+	const { posture, setPosture } = usePostureStore();
+	const [cumSum, setCumSum] = useState(0);
 
   const handleNextRound = () => {
     setCurrentRound(currentRound + 1);
@@ -190,7 +196,7 @@ const Room = () => {
 
       // Handle incoming messages from the server
       socket.onmessage = (event) => {
-        console.log(event);
+        // console.log(event);
 
         const data = JSON.parse(event.data);
 
@@ -284,57 +290,6 @@ const Room = () => {
 		clearBlobUrl();
 	};
 }, [mediaBlobUrl]);
-
-  useEffect(() => {
-    // async function uploadVoice() {
-    //   const audioBlob = await fetch(mediaBlobUrl).then((r) => r.blob());
-    //   const audiofile = new File([audioBlob], "response.wav", {
-    //     type: "audio/wav",
-    //   });
-    //   const downloadLink = document.createElement("a");
-    //   const url = URL.createObjectURL(audioBlob); // Create a URL for the blob
-    //   downloadLink.href = url;
-    //   downloadLink.download = "response.wav"; // Set the desired file name
-
-    //   // Programmatically click the link to trigger the download
-    //   document.body.appendChild(downloadLink);
-    //   downloadLink.click();
-
-    //   // Clean up by removing the link and revoking the object URL
-    //   document.body.removeChild(downloadLink);
-    //   URL.revokeObjectURL(url);
-
-    //   const formData = new FormData();
-    //   formData.append("summary", summary);
-    //   formData.append("company", room.company);
-    //   formData.append("position", room.position);
-    //   formData.append("question", questions[currentRound]);
-    //   formData.append("response", audiofile, "response.wav");
-    //   const res = await fetch("http://localhost:8000/grade", {
-    //     method: "POST",
-    //     body: formData,
-    //   });
-    //   const body = await res.json();
-
-    //   const rating = body.score / 20;
-
-    //   if (currentRound + 1 >= questions.length && roomStarted) {
-    //     endRoom();
-    //   }
-
-    //   console.log("HANDLING BREAK AND ADDING USER TO ROUND!!!");
-
-    //   addUserToRound(currentRound, {
-    //     userId: 0,
-    //     name: room.user,
-    //     rating: rating,
-    //     answer: `My dad owns ${room.company}`,
-    //   });
-    // }
-    // if (mediaBlobUrl) {
-    //   uploadVoice();
-    // }
-  }, [mediaBlobUrl]);
 
   const endRoom = () => {
     setRoomStarted(false);

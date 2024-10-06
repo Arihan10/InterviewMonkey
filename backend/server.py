@@ -1,9 +1,12 @@
 import os
 from openai import OpenAI
 
+import cv2
+import numpy as np
+
 from scraper import Scraper
 from gpt import Gpt
-from interviewer import Interviewer
+from camera import check_posture
 
 import asyncio
 
@@ -16,12 +19,11 @@ class Server:
 
         self.client = OpenAI(
             api_key = os.environ.get("OPENAI_API_KEY"),
-            organization = os.environ.get("OPENAI_ORGANIZATION")
+            #organization = os.environ.get("OPENAI_ORGANIZATION")
         )
 
         self.scraper = Scraper()
         self.gpt = Gpt(self.client)
-        # self.interviewer = Interviewer(self.client)
 
     def set_manager(self, manager):
         self.manager = manager
@@ -38,6 +40,11 @@ class Server:
         while (True):
             message_data, room = await self.asyncQueue.get()
 
+            if message_data is None:
+                continue
+
+            # print("message_data", message_data, room)
+
             # parse message
             client_id = message_data.get("client_id")
             message = message_data.get("message")
@@ -49,16 +56,13 @@ class Server:
                 "message": message,
             }
 
-            print (json_message)
-
             # HAVE TYPE STUFF HERE
             if (type == "answer"):
                 # handle
                 pass
             elif (type == "frame"):
-                frame = message_data.get("data")
-                # process frame here
-                score = self.interviewer.score_frame(frame)
+                frame = cv2.imdecode(np.frombuffer(message, np.uint8), cv2.IMREAD_COLOR)
+                score = check_posture(frame)
                 broadcast_message = f"Posture {score[0]} {score[1]}"
                 await self.manager.send_message(broadcast_message, room)
             else:
