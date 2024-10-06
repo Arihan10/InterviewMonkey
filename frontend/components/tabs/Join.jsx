@@ -9,15 +9,21 @@ import { useRouter } from "next/navigation";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
+import useRoomStore from "@/stores/roomStore";
+
 const Create = () => {
-	const [room, setRoom] = useState("");
+	const [roomCode, setRoomCode] = useState("");
 	const [name, setName] = useState("");
 
 	const router = useRouter();
 
-	const handleJoinRoom = () => {
-		if (room) {
-			router.push(`/room/room/${room}?mode=join`);
+	const { setRoom } = useRoomStore();
+
+	const handleJoinRoom = (e) => {
+		e.preventDefault();
+		if (roomCode != "") {
+			setRoom(roomCode);
+			router.push(`/room/room/${roomCode}?mode=join`);
 		}
 	};
 
@@ -51,8 +57,8 @@ const Create = () => {
 						placeholder={"ABCD1234"}
 						type={"text"}
 						buttonText={"Join Room"}
-						disabled={!room}
-						setValue={setRoom}
+						disabled={!roomCode}
+						setValue={setRoomCode}
 					/>
 				</form>
 			</div>

@@ -35,7 +35,7 @@ const VideoStream = () => {
 	};
 
 	return (
-		<div className='absolute w-full'>
+		<div className='absolute left-0 w-full'>
 			<video
 				ref={videoRef}
 				autoPlay
