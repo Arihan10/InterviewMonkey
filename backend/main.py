@@ -93,10 +93,9 @@ async def questions(company: str, position: str, n: int):
 @app.post("/grade")
 async def grade(company: str, position: str, summary: str, question: str, response: str):
 
-    score = server.gpt.score(company, position, summary, question, response)
+    output = server.gpt.score(company, position, summary, question, response)
 
-    # score is a string
-    return {score}
+    return output
 
 server.set_manager(manager)
 

@@ -1,9 +1,49 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import useWsStore from "../stores/wsStore";
 
 const VideoStream = () => {
 	const videoRef = useRef(null);
+	const recognitionRef = useRef(null);
+	const { ws } = useWsStore();
+
+	const startSpeechRecognition = () => {
+		if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+			console.error("SpeechRecognition is not supported in this browser.");
+			return;
+		}
+
+		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+		const recognition = new SpeechRecognition();
+		recognition.continuous = true;
+		recognition.interimResults = true;
+		recognition.lang = "en-US";
+
+		recognition.onstart = () => {
+			console.log("Speech recognition started");
+		};
+
+		recognition.onresult = (event) => {
+			let transcript = '';
+			for (let i = event.resultIndex; i < event.results.length; i++) {
+				transcript += event.results[i][0].transcript;
+			}
+			// let transcript = event.results[event.results.length-1][0].transcript
+			console.log("Recognized Speech:", transcript, "Length: ", event.results.length);
+		};
+
+		recognition.onerror = (event) => {
+			console.error("Speech recognition error:", event.error);
+		};
+
+		recognition.onend = () => {
+			console.log("Speech recognition ended");
+		};
+
+		recognition.start();
+		recognitionRef.current = recognition;
+	};
 
 	useEffect(() => {
 		async function startVideo() {
@@ -20,6 +60,16 @@ const VideoStream = () => {
 		}
 
 		startVideo();
+		startSpeechRecognition();
+
+		requestAnimationFrame(sendFrameToBackend);
+
+		return () => {
+			if (recognitionRef.current) {
+				recognitionRef.current.stop();
+				console.log("Speech recognition stopped");
+			}
+		};
 	}, []);
 
 	const sendFrameToBackend = () => {
@@ -28,10 +78,13 @@ const VideoStream = () => {
 		canvas.width = videoRef.current.videoWidth;
 		canvas.height = videoRef.current.videoHeight;
 		context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-
-		// Convert the frame to a data URL or blob for transmission
-		const frameData = canvas.toDataURL("image/jpeg"); // You can also use a blob for better performance
-		sendFrameToBackend(frameData);
+	
+		canvas.toBlob((blob) => {
+			// console.log("Blob", blob);
+			if (!ws) return;
+			if (ws.readyState === WebSocket.OPEN) ws.send(blob, { binary: true });
+		}, "image/jpeg");
+		requestAnimationFrame(sendFrameToBackend);
 	};
 
 	return (

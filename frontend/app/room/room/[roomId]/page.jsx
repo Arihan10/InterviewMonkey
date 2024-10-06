@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import VideoStream from "@/components/VideoStream";
 import Image from "next/image";
 import { TypographyH3 } from "@/components/ui/typo/TypographyH3";
 import { TypographyH2 } from "@/components/ui/typo/TypographyH2";
-import { TypographyP } from "@/components/ui/typo/TypographyP";
 import useRoomStore from "@/stores/roomStore";
 import useAccentStore from "@/stores/accentStore";
 import { useRouter } from "next/navigation";
