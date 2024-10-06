@@ -17,6 +17,7 @@ const Room = () => {
 	useEffect(() => {
 		if (!ran.current) {
 			// Establish WebSocket connection to FastAPI
+
 			const socket = new WebSocket(`ws://localhost:8000/ws/${roomId}`);
 			setSocket(socket);
 
