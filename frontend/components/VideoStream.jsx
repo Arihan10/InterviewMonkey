@@ -56,7 +56,10 @@ const VideoStream = () => {
 				wsRef.current.send(blob, { binary: true });
 			}
 		}, "image/jpeg");
-		requestRef.current = requestAnimationFrame(sendFrameToBackend);
+
+		setTimeout(() => {
+			requestRef.current = requestAnimationFrame(sendFrameToBackend);
+		}, 500);
 	};
 
 	return (

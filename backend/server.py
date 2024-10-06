@@ -55,18 +55,15 @@ class Server:
                 "type": type,
                 "message": message,
             }
-            print("message type", type)
 
             # HAVE TYPE STUFF HERE
             if (type == "answer"):
                 # handle
                 pass
             elif (type == "frame"):
-                print("hi")
                 frame = cv2.imdecode(np.frombuffer(message, np.uint8), cv2.IMREAD_COLOR)
                 score = check_posture(frame)
                 broadcast_message = f"Posture {score[0]} {score[1]}"
-                print("Posture score", score)
                 await self.manager.send_message(broadcast_message, room)
             else:
                 await self.manager.send_message(json_message, room)

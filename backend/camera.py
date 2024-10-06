@@ -35,9 +35,9 @@ def analyze_posture(landmarks):
     
     # [True, False] shoulders aligned, head aligned
     print(shoulder_angle, head_angle)
-    return [abs(180 - abs(shoulder_angle)) < 40, abs(180 - abs(head_angle)) < 20]
+    return [abs(180 - abs(shoulder_angle)) < 10, abs(180 - abs(head_angle)) < 10]
     
-
+once = 5
 
 def check_posture(frame):
     """
@@ -50,6 +50,12 @@ def check_posture(frame):
 
     if results.pose_landmarks:
         mp.solutions.drawing_utils.draw_landmarks(frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+        global once
+        once -= 1
+        if once == 0:
+            once = 5
+            cv2.imwrite("posture.jpg", frame)
+
         return analyze_posture(results.pose_landmarks.landmark)
     return [False, False]
 
