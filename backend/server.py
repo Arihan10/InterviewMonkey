@@ -58,8 +58,12 @@ class Server:
 
             # HAVE TYPE STUFF HERE
             if (type == "answer"):
+                print(message_data)
+
                 # handle
-                pass
+                print("ANSWER RECEIVED FOR " + client_id + " aka " + message_data.get("message").get("name"))
+                
+                await self.manager.send_message(message_data, room)
             elif (type == "frame"):
                 # print("hi")
                 frame = cv2.imdecode(np.frombuffer(message, np.uint8), cv2.IMREAD_COLOR)

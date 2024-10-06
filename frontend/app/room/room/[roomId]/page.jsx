@@ -221,8 +221,26 @@ const Room = () => {
 						setSummary(body["summary"])
 			
 						handleInterviewStart(); 
+
 						break; 
-			
+          case "answer": 
+            const ansBody = data.message
+
+            if (clientId != ansBody["client_id"]) {
+              console.log("GETTING OTHER PLAYER'S SHIT!!!!")
+
+              console.log(ansBody)
+              console.log(rounds)
+
+              addUserToRound(currentRound - 1, {//this might break things
+                userId: ansBody.client_id,
+                name: ansBody.name,
+                rating: ansBody.score,
+                answer: ansBody.feedback,
+              });
+            }
+
+            break; 
 					default:
 						setMessages((prev) => [
 							...prev,
@@ -284,9 +302,20 @@ const Room = () => {
 					method: "POST",
 					body: formData,
 				});
-				const body = await res.json();
+				const body = await res.json(); 
 
-				const rating = body.score / 20;
+        const resBody = {
+          "feedback": body.feedback,
+          "score": body.score,
+          "name": room.user,
+          "client_id": clientId,
+        }
+
+        console.log(body); 
+
+        handleSendMessage("answer", resBody); 
+
+				const rating = body.score / 20; 
 
 				if (currentRound + 1 >= questions.length && roomStarted) {
 					endRoom();
@@ -367,6 +396,8 @@ const Room = () => {
 		});
 		const body = await res.json();
 
+    console.log("ROOM START CALLED")
+
 		handleSendMessage("event", body)
 
 		setQuestions(body.questions);
@@ -385,6 +416,7 @@ const Room = () => {
         client_id: clientId, // Send the client's unique ID with the message
         message: message
       };
+      console.log("SENDING MF")
 		  socket.send(JSON.stringify(payload));  // Send the payload as JSON
 	  }
 	};
