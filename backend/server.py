@@ -55,7 +55,6 @@ class Server:
                 "type": type,
                 "message": message,
             }
-            # print("message type", type)
 
             # HAVE TYPE STUFF HERE
             if (type == "answer"):
