@@ -214,7 +214,8 @@ const Room = () => {
 			
 						console.log(data.message)
 			
-						body = JSON.parse(data.message)
+						// body = JSON.parse(data.message)
+            const body = data.message
 			
 						setQuestions(body["questions"])
 						setSummary(body["summary"])
