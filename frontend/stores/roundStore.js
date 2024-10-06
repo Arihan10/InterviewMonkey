@@ -26,7 +26,7 @@ const useRoundStore = create((set) => ({
 			newRounds[roundIndex] = {
 				...newRounds[roundIndex],
 				users: [
-					...newRounds[roundIndex].users,
+					...newRounds[roundIndex]?.users,
 					user
 				]
 			};
