@@ -16,6 +16,9 @@ from selenium.webdriver.chrome.service import Service
 
 from gpt import Gpt
 
+from dotenv import load_dotenv
+load_dotenv()
+
 
 class Scraper:
     def __init__(self):
@@ -23,13 +26,13 @@ class Scraper:
         options.add_argument('--headless=new')
         options.add_argument("--window-size=1,1")
 
-        # chrome_driver_path = "C:/Users/Ariha/Downloads/chromedriver-win64/chromedriver-win64/chromedriver.exe"
+        chrome_driver_path = os.environ.get("CHROME_DRIVER_PATH")
 
-        # service = Service(executable_path=chrome_driver_path)
+        service = Service(executable_path=chrome_driver_path)
 
-        # self.driver = webdriver.Chrome(options=options, service=service)
+        self.driver = webdriver.Chrome(options=options, service=service)
 
-        self.driver = webdriver.Chrome(options=options)
+        # self.driver = webdriver.Chrome(options=options)
 
     def get_contents(self, company, position) -> List[str]:
         """
