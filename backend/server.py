@@ -56,7 +56,7 @@ class Server:
                 # handle
                 pass
             elif (type == "frame"):
-                frame = None
+                frame = message_data.get("data")
                 # process frame here
                 score = self.interviewer.score_frame(frame)
                 broadcast_message = f"Posture {score[0]} {score[1]}"
