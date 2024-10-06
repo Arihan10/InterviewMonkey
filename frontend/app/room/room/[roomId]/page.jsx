@@ -255,7 +255,8 @@ const Room = () => {
 					userId: 0,
 					name: room.user,
 					rating: rating,
-					answer: `My dad owns ${room.company}`,
+					// answer: `My dad owns ${room.company}`,
+          answer: body.transcription,
 				});
 			})();
 		}
