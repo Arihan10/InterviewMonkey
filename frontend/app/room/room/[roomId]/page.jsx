@@ -205,7 +205,7 @@ const Room = () => {
               className="absolute flex items-center justify-center rounded-full size-16 bottom-2 right-2"
               style={{ backgroundColor: accent }}
             >
-              <TypographyH2 className="mix-blend-difference text-white">
+              <TypographyH2 className="text-white">
                 {timeRemaining}
               </TypographyH2>
             </div>

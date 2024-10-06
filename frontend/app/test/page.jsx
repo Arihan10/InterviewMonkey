@@ -11,7 +11,7 @@ import Join from "@/components/tabs/Join";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useAccentStore from "@/stores/accentStore";
 
-const Home = () => {
+const Home = ({ searchParams }) => {
 	// const [room, setRoom] = useState("");
 	// const router = useRouter();
 
@@ -25,6 +25,10 @@ const Home = () => {
 	// 		router.push(`/room/${room}`);
 	// 	}
 	// };
+	if (searchParams.code) {
+		return <>Balls itch</>
+	}
+
 	const accent = useAccentStore((state) => state.accent);
 
 	return (
