@@ -16,6 +16,7 @@ import useRoundStore from "@/stores/roundStore";
 import { useInterval } from "@/lib/useInterval";
 import { v4 as uuidv4 } from "uuid";
 import useWsStore from "@/stores/wsStore";
+import usePostureStore from "@/stores/postureStore";
 
 import Posture from "@/components/Posture";
 
@@ -82,6 +83,7 @@ const Room = () => {
 	const accent = useAccentStore((state) => state.accent);
 	const { addRound, addUserToRound, rounds, setRounds } = useRoundStore();
 	const { room } = useRoomStore();
+	const { posture, setPosture } = usePostureStore();
 
 	const handleNextRound = () => {
 		setCurrentRound(currentRound + 1);
@@ -95,7 +97,7 @@ const Room = () => {
 	const mode = searchParams.get("mode");
 
 	useEffect(() => {
-		console.log("RUNNING!!!")
+		console.log("RUNNING!!!");
 		if (!ran.current) {
 			// Establish WebSocket connection to FastAPI
 			console.log("NOT RAN.CURRENT");
@@ -106,9 +108,21 @@ const Room = () => {
 
 			// Handle incoming messages from the server
 			socket.onmessage = (event) => {
-				console.log(event);
+				// console.log(event);
 
 				const data = JSON.parse(event.data);
+				if (data.includes("Posture")) {
+					//please partse "Posture true true" into an array
+					const result = data
+						.split(" ")
+						.filter((word) => word === "True" || word === "False")
+						.map((word) => word === "True");
+
+					console.log(result);
+					if (result != posture) {
+						setPosture(result);
+					}
+				}
 
 				switch (data.type) {
 					case "message":
