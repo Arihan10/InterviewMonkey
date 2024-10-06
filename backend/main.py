@@ -88,26 +88,33 @@ async def websocket_endpoint(websocket: WebSocket, room: str):
     try:
         while True:
             message = await websocket.receive()
+            if message["type"] != "websocket.receive":
+                continue
             if "bytes" in message:
                 binary_data = message["bytes"]
-                # print(f"Received binary data of length {len(binary_data)}")
+
+                #print(f"Received binary data of length {len(binary_data)}")
 
                 with open("received_image.png", "wb") as f:
                     f.write(binary_data)
                 
                 await asyncQueue.put(({
+                    "client_id": 0,
+                    "message": binary_data,
                     "type": "frame",
-                    "data": binary_data
                 }, room))
 
-            elif "text" in message:
+                # print("adding to async queue")
+
+            elif "text" in message and message["text"]:
                 text_data = message["text"]
+
                 message_data = json.loads(text_data)
 
                 print("message data", message_data)
 
                 await asyncQueue.put((message_data, room))
-                print(f"Received text data: {text_data}")
+                # print(f"Received text data: {text_data}")
                 await manager.send_message("Text received", websocket)
 
     except WebSocketDisconnect:

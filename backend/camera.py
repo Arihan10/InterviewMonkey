@@ -32,10 +32,9 @@ def analyze_posture(landmarks):
     # Calculate distances
     shoulder_width = distance(left_shoulder, right_shoulder)
     head_width = distance(left_ear, right_ear)
-
     
     # [True, False] shoulders aligned, head aligned
-    return [abs(180 - abs(shoulder_angle)) < 10, abs(180 - abs(head_angle)) > 5]
+    return [abs(180 - abs(shoulder_angle)) < 10, abs(180 - abs(head_angle)) < 5]
     
 
 
@@ -51,6 +50,7 @@ def check_posture(frame):
     if results.pose_landmarks:
         mp.solutions.drawing_utils.draw_landmarks(frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
         return analyze_posture(results.pose_landmarks.landmark)
+    return [False, False]
 
     
 
@@ -64,23 +64,12 @@ def check_posture(frame):
 
 
 
-def read_frame(frame):
-    """
-    Process the frame and return the results
-    """
-    frame = np.frombuffer(frame, dtype=np.uint8)
-    frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
-
-    check_posture(frame)
-
-
-
 if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
 
     while True:
         ret, frame = cap.read()
-        check_posture(frame)
+        print(check_posture(frame))
         #check_facial_expressions(frame) # facial expression analysis is very slow and laggy
 
         cv2.imshow("Posture", frame)

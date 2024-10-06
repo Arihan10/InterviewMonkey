@@ -6,6 +6,7 @@ import useWsStore from "../stores/wsStore";
 const VideoStream = () => {
 	const videoRef = useRef(null);
 	const { ws } = useWsStore();
+	const wsRef = useRef(ws);
 
 	useEffect(() => {
 		async function startVideo() {
@@ -31,10 +32,13 @@ const VideoStream = () => {
 	}, []);
 
 	useEffect(() => {
-		console.log("Here's ws", ws);
-	}, [ws]);
+		console.log("Here's ws", ws, wsRef.current);
+		wsRef.current = ws;
+	}, [ws, wsRef]);
 
-	const sendFrameToBackend = useCallback(() => {
+	const requestRef = useRef()
+
+	const sendFrameToBackend = () => {
 		const canvas = document.createElement("canvas");
 		const context = canvas.getContext("2d");
 		canvas.width = videoRef.current.videoWidth;
@@ -45,15 +49,15 @@ const VideoStream = () => {
 			// console.log("Blob", blob);
 			// console.log("socket", ws);
 			// console.log("socket status", ws && ws.readyState)
-			if (!ws) return;
+			if (!wsRef.current) return;
 			// console.log("Websocket is present")
-			if (ws.readyState === WebSocket.OPEN) {
+			if (wsRef.current.readyState === WebSocket.OPEN) {
 				// console.log("SENDING BLOB");
-				ws.send(blob, { binary: true });
+				wsRef.current.send(blob, { binary: true });
 			}
 		}, "image/jpeg");
-		requestAnimationFrame(sendFrameToBackend);
-	}, [ws]);
+		requestRef.current = requestAnimationFrame(sendFrameToBackend);
+	};
 
 	return (
 		<div className='absolute left-0 w-full'>
