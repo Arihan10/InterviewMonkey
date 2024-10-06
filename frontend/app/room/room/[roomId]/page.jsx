@@ -114,6 +114,7 @@ const Room = () => {
 	// const [socket, setSocket] = useState(null);
 	const [messages, setMessages] = useState([]);
 	//const { ws: socket, setWs: setSocket } = useWsStore(); // remove? arihan
+	const [interviewStarted, setInterviewStarted] = useState(false);
 	const [socket, setSocket] = useState(null);
 
 	const advanced = useRef(false);
@@ -205,6 +206,7 @@ const Room = () => {
 							...prev,
 							`Event: ${data.message}`,
 						]);
+						setInterviewStarted(true);
 
 						console.log("EVENT RECEIVED!")
 
@@ -212,8 +214,7 @@ const Room = () => {
 			
 						console.log(data.message)
 			
-						// body = JSON.parse(data.message)
-            body = data.message
+						body = JSON.parse(data.message)
 			
 						setQuestions(body["questions"])
 						setSummary(body["summary"])
@@ -389,14 +390,14 @@ const Room = () => {
 
 	const handleInterviewStart = async () => {
 		setRoomStarted(true);
-    setRounds([]);
-    setCurrentRound(0);
-    addRound(0);
+			setRounds([]);
+			setCurrentRound(0);
+			addRound(0);
   }
 
-  useInterval(() => {
-    console.log("Socket status", socket?.readyState)
-  }, 1000, true, [])
+    useInterval(() => {
+      console.log("Socket status", socket?.readyState)
+    }, 1000, true, [])
 	
 
 	if (mode == "join" && !roomStarted) {
