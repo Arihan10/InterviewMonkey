@@ -19,6 +19,7 @@ import useWsStore from "@/stores/wsStore";
 import usePostureStore from "@/stores/postureStore";
 
 import Posture from "@/components/Posture";
+import { set } from "zod";
 
 const roundsObject = [
 	{
@@ -72,6 +73,7 @@ const Room = () => {
 	const [message, setMessage] = useState("");
 	const [messages, setMessages] = useState([]);
 	const { ws: socket, setWs: setSocket } = useWsStore();
+	const [interviewStarted, setInterviewStarted] = useState(false);
 
 	const advanced = useRef(false);
 
@@ -84,6 +86,7 @@ const Room = () => {
 	const { addRound, addUserToRound, rounds, setRounds } = useRoundStore();
 	const { room } = useRoomStore();
 	const { posture, setPosture } = usePostureStore();
+	const [cumSum, setCumSum] = useState(0);
 
 	const handleNextRound = () => {
 		setCurrentRound(currentRound + 1);
@@ -119,6 +122,15 @@ const Room = () => {
 						.map((word) => word === "True");
 
 					console.log(result);
+
+					if (result[0] && result[1]) {
+						console.log("Posture is good");
+						setCumSum((prev) => prev - 1);
+					} else {
+						console.log("Posture is bad");
+						setCumSum((prev) => prev + 3);
+					}
+
 					if (result != posture) {
 						setPosture(result);
 					}
@@ -331,7 +343,7 @@ const Room = () => {
 			<div className='flex flex-1 w-full gap-4'>
 				<div className='flex flex-col flex-1 h-full gap-4'>
 					<div className='relative flex items-center justify-center flex-1 overflow-hidden rounded-md bg-zinc-100'>
-						<Posture />
+						<Posture cumSum={cumSum} />
 						<VideoStream />
 						<div
 							className='absolute flex items-center justify-center rounded-full size-16 bottom-2 right-2'
@@ -365,9 +377,11 @@ const Room = () => {
 					) : (
 						<div className='space-y-4'>
 							<TypographyH3>Start Room</TypographyH3>
-							<Button onClick={handleRoomStart}>
-								Start Room
-							</Button>
+							{questions.length > 0 && (
+								<Button onClick={handleRoomStart}>
+									Start Room
+								</Button>
+							)}
 						</div>
 					)}
 				</div>
