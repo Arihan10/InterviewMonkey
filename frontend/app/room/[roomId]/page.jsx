@@ -1,18 +1,21 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 
 const Room = () => {
 	const { roomId } = useParams();
+	const searchParams = useSearchParams(); 
 	const [message, setMessage] = useState("");
 	const [messages, setMessages] = useState([]);
 	const [clientId] = useState(uuidv4()); // Generate unique client ID once
 	const [socket, setSocket] = useState(null);
 	const [interviewStarted, setInterviewStarted] = useState(false); 
 
-	const ran = useRef(false);
+	const ran = useRef(false); 
+
+	const mode = searchParams.get("mode"); 
 
 	useEffect(() => {
 		if (!ran.current) {
@@ -67,7 +70,7 @@ const Room = () => {
 	  <div>
 		<h2>Room: {roomId}</h2>
 
-		{!interviewStarted && (
+		{!interviewStarted && mode=="create" && (
 			<button onClick={() => handleSendMessage('event')}>Start Interview</button>
 		)}
 
