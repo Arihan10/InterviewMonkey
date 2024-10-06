@@ -44,14 +44,17 @@ class ConnectionManager:
                 del self.active_connections[room]
 
     async def send_message(self, message: str, room: str, client_id: str = None):
+        # print(self.active_connections.get("a"))
+
         json_message = json.dumps(message)
 
         if room in self.active_connections:
             if client_id:
                 if client_id in self.active_connections[room]:
-                    await self.active_connections[room][client_id].send_test(json_message)
+                    await self.active_connections[room][client_id].send_text(json_message)
             else:
                 for connection in self.active_connections[room]:
+                    print("sending to connection!")
                     await connection.send_text(json_message)
 
 manager = ConnectionManager()
@@ -77,7 +80,7 @@ async def recv_bin(websocket: WebSocket, room: str):
             with open("received_image.png", "wb") as f:
                 f.write(binary_data)
 
-            print(f"Image saved at: {"received_image.png"}")
+            # print(f"Image saved at: {"received_image.png"}")
     except WebSocketDisconnect:
         manager.disconnect(websocket, room)
 
@@ -112,7 +115,7 @@ async def websocket_endpoint(websocket: WebSocket, room: str):
 
                 message_data = json.loads(text_data)
 
-                print("message data", message_data)
+                # print("message data", message_data)
 
                 await asyncQueue.put((message_data, room))
                 # print(f"Received text data: {text_data}")

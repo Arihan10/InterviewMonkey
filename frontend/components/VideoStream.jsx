@@ -24,7 +24,7 @@ const VideoStream = () => {
 
 		startVideo();
 
-		requestAnimationFrame(sendFrameToBackend);
+		// requestAnimationFrame(sendFrameToBackend);
 
 		return () => {
 
@@ -38,29 +38,29 @@ const VideoStream = () => {
 
 	const requestRef = useRef()
 
-	const sendFrameToBackend = () => {
-		const canvas = document.createElement("canvas");
-		const context = canvas.getContext("2d");
-		canvas.width = videoRef.current.videoWidth;
-		canvas.height = videoRef.current.videoHeight;
-		context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+	// const sendFrameToBackend = () => {
+	// 	const canvas = document.createElement("canvas");
+	// 	const context = canvas.getContext("2d");
+	// 	canvas.width = videoRef.current.videoWidth;
+	// 	canvas.height = videoRef.current.videoHeight;
+	// 	context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 	
-		canvas.toBlob((blob) => {
-			// console.log("Blob", blob);
-			// console.log("socket", ws);
-			// console.log("socket status", ws && ws.readyState)
-			if (!wsRef.current) return;
-			// console.log("Websocket is present")
-			if (wsRef.current.readyState === WebSocket.OPEN) {
-				// console.log("SENDING BLOB");
-				wsRef.current.send(blob, { binary: true });
-			}
-		}, "image/jpeg");
+	// 	canvas.toBlob((blob) => {
+	// 		// console.log("Blob", blob);
+	// 		// console.log("socket", ws);
+	// 		// console.log("socket status", ws && ws.readyState)
+	// 		if (!wsRef.current) return;
+	// 		// console.log("Websocket is present")
+	// 		if (wsRef.current.readyState === WebSocket.OPEN) {
+	// 			// console.log("SENDING BLOB");
+	// 			wsRef.current.send(blob, { binary: true });
+	// 		}
+	// 	}, "image/jpeg");
 
-		setTimeout(() => {
-			requestRef.current = requestAnimationFrame(sendFrameToBackend);
-		}, 500);
-	};
+	// 	setTimeout(() => {
+	// 		requestRef.current = requestAnimationFrame(sendFrameToBackend);
+	// 	}, 500);
+	// };
 
 	return (
 		<div className='absolute left-0 w-full'>
