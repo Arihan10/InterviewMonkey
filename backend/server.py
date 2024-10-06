@@ -66,7 +66,7 @@ class Server:
                 score = check_posture(frame)
                 broadcast_message = f"Posture {score[0]} {score[1]}"
                 # print("Posture score", score)
-                await self.manager.send_message(broadcast_message, room)
+                #await self.manager.send_message(broadcast_message, room)
             else:
                 print("TYPE IS " + type)
                 await self.manager.send_message(json_message, room)

@@ -44,14 +44,17 @@ class ConnectionManager:
                 del self.active_connections[room]
 
     async def send_message(self, message: str, room: str, client_id: str = None):
+        # print(self.active_connections.get("a"))
+
         json_message = json.dumps(message)
 
         if room in self.active_connections:
             if client_id:
                 if client_id in self.active_connections[room]:
-                    await self.active_connections[room][client_id].send_test(json_message)
+                    await self.active_connections[room][client_id].send_text(json_message)
             else:
                 for connection in self.active_connections[room]:
+                    print("sending to connection!")
                     await connection.send_text(json_message)
 
 manager = ConnectionManager()
