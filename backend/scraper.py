@@ -139,7 +139,7 @@ if __name__ == "__main__":
 
     client = OpenAI(
         api_key = os.environ.get("OPENAI_API_KEY"),
-        organization = os.environ.get("OPENAI_ORGANIZATION")
+        # organization = os.environ.get("OPENAI_ORGANIZATION")
     )
 
     scraper = Scraper()

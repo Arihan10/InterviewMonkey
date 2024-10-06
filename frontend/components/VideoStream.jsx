@@ -1,49 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import useWsStore from "../stores/wsStore";
 
 const VideoStream = () => {
 	const videoRef = useRef(null);
-	const recognitionRef = useRef(null);
 	const { ws } = useWsStore();
-
-	const startSpeechRecognition = () => {
-		if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
-			console.error("SpeechRecognition is not supported in this browser.");
-			return;
-		}
-
-		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-		const recognition = new SpeechRecognition();
-		recognition.continuous = true;
-		recognition.interimResults = true;
-		recognition.lang = "en-US";
-
-		recognition.onstart = () => {
-			console.log("Speech recognition started");
-		};
-
-		recognition.onresult = (event) => {
-			let transcript = '';
-			for (let i = event.resultIndex; i < event.results.length; i++) {
-				transcript += event.results[i][0].transcript;
-			}
-			// let transcript = event.results[event.results.length-1][0].transcript
-			console.log("Recognized Speech:", transcript, "Length: ", event.results.length);
-		};
-
-		recognition.onerror = (event) => {
-			console.error("Speech recognition error:", event.error);
-		};
-
-		recognition.onend = () => {
-			console.log("Speech recognition ended");
-		};
-
-		recognition.start();
-		recognitionRef.current = recognition;
-	};
 
 	useEffect(() => {
 		async function startVideo() {
@@ -60,19 +22,19 @@ const VideoStream = () => {
 		}
 
 		startVideo();
-		startSpeechRecognition();
 
 		requestAnimationFrame(sendFrameToBackend);
 
 		return () => {
-			if (recognitionRef.current) {
-				recognitionRef.current.stop();
-				console.log("Speech recognition stopped");
-			}
+
 		};
 	}, []);
 
-	const sendFrameToBackend = () => {
+	useEffect(() => {
+		console.log("Here's ws", ws);
+	}, [ws]);
+
+	const sendFrameToBackend = useCallback(() => {
 		const canvas = document.createElement("canvas");
 		const context = canvas.getContext("2d");
 		canvas.width = videoRef.current.videoWidth;
@@ -81,11 +43,17 @@ const VideoStream = () => {
 	
 		canvas.toBlob((blob) => {
 			// console.log("Blob", blob);
+			// console.log("socket", ws);
+			// console.log("socket status", ws && ws.readyState)
 			if (!ws) return;
-			if (ws.readyState === WebSocket.OPEN) ws.send(blob, { binary: true });
+			// console.log("Websocket is present")
+			if (ws.readyState === WebSocket.OPEN) {
+				// console.log("SENDING BLOB");
+				ws.send(blob, { binary: true });
+			}
 		}, "image/jpeg");
 		requestAnimationFrame(sendFrameToBackend);
-	};
+	}, [ws]);
 
 	return (
 		<div className='absolute left-0 w-full'>
