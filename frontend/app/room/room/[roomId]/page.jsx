@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import VideoStream from "@/components/VideoStream";
 import Image from "next/image";
 import { TypographyH3 } from "@/components/ui/typo/TypographyH3";
@@ -15,6 +15,7 @@ import useQuestionSummaryStore from "@/stores/questionsStore";
 import useRoundStore from "@/stores/roundStore";
 import { useInterval } from "@/lib/useInterval";
 import { v4 as uuidv4 } from "uuid";
+import useWsStore from "@/stores/wsStore";
 
 const roundsObject = [
 	{
@@ -64,9 +65,10 @@ const Room = () => {
 	const [timeRemaining, setTimeRemaining] = useState(roundTime); // 60 seconds for question round
 	const [isBreak, setIsBreak] = useState(false); // Tracks if it's break time
 	const [clientId] = useState(uuidv4());
-	const [socket, setSocket] = useState(null);
+	// const [socket, setSocket] = useState(null);
 	const [message, setMessage] = useState("");
 	const [messages, setMessages] = useState([]);
+	const { ws: socket, setWs: setSocket } = useWsStore();
 
 	const advanced = useRef(false);
 
@@ -91,10 +93,13 @@ const Room = () => {
 	const mode = searchParams.get("mode");
 
 	useEffect(() => {
+		console.log("RUNNING!!!")
 		if (!ran.current) {
 			// Establish WebSocket connection to FastAPI
+			console.log("NOT RAN.CURRENT");
 
 			const socket = new WebSocket(`ws://localhost:8000/ws/${roomId}`);
+			console.log("Wtf??? socket", socket);
 			setSocket(socket);
 
 			// Handle incoming messages from the server
@@ -273,7 +278,7 @@ const Room = () => {
 				</div>
 				<div>
 					<TypographyH2>Waiting for room to start...</TypographyH2>
-					<TypographyP>Room Code: {room}</TypographyP>
+					<TypographyP>Room Code: {room.room}</TypographyP>
 				</div>
 			</div>
 		);
@@ -336,7 +341,7 @@ const Room = () => {
 						<>
 							<TypographyH3>
 								Room Code:{" "}
-								<span className='font-normal'>{room}</span>
+								<span className='font-normal'>{room.room}</span>
 							</TypographyH3>
 							<QuestionRoundsAccordion />
 						</>

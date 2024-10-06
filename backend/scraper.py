@@ -23,13 +23,13 @@ class Scraper:
         options.add_argument('--headless=new')
         options.add_argument("--window-size=1,1")
 
-        chrome_driver_path = "C:/Users/Ariha/Downloads/chromedriver-win64/chromedriver-win64/chromedriver.exe"
+        # chrome_driver_path = "C:/Users/Ariha/Downloads/chromedriver-win64/chromedriver-win64/chromedriver.exe"
 
-        service = Service(executable_path=chrome_driver_path)
+        # service = Service(executable_path=chrome_driver_path)
 
-        self.driver = webdriver.Chrome(options=options, service=service)
+        # self.driver = webdriver.Chrome(options=options, service=service)
 
-        # self.driver = webdriver.Chrome(options=options)
+        self.driver = webdriver.Chrome(options=options)
 
     def get_contents(self, company, position) -> List[str]:
         """
@@ -136,7 +136,7 @@ if __name__ == "__main__":
 
     client = OpenAI(
         api_key = os.environ.get("OPENAI_API_KEY"),
-        organization = os.environ.get("OPENAI_ORGANIZATION")
+        # organization = os.environ.get("OPENAI_ORGANIZATION")
     )
 
     scraper = Scraper()
