@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import VideoStream from "@/components/VideoStream";
 import Image from "next/image";
 import { TypographyH3 } from "@/components/ui/typo/TypographyH3";
@@ -15,6 +15,8 @@ import useQuestionSummaryStore from "@/stores/questionsStore";
 import useRoundStore from "@/stores/roundStore";
 import { useInterval } from "@/lib/useInterval";
 import { v4 as uuidv4 } from "uuid";
+
+import Posture from "@/components/Posture";
 
 const roundsObject = [
 	{
@@ -310,6 +312,7 @@ const Room = () => {
 			<div className='flex flex-1 w-full gap-4'>
 				<div className='flex flex-col flex-1 h-full gap-4'>
 					<div className='relative flex items-center justify-center flex-1 overflow-hidden rounded-md bg-zinc-100'>
+						<Posture />
 						<VideoStream />
 						<div
 							className='absolute flex items-center justify-center rounded-full size-16 bottom-2 right-2'
