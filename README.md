@@ -1,3 +1,5 @@
+Welcome to InterviewMonkey.
+
 # 🌟Inspiration
 The interview process can be unpredictable and stressful, especially when you’re targeting different companies and roles. We wanted to create a tool that makes interview prep more personalized, engaging, and interactive, while simulating a competitive and realistic environment. That’s why we built InterviewMonkeyDuels, combining AI, machine learning, and gamification to offer a unique preparation experience for all skill levels.
 
