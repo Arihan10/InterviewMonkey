@@ -1,4 +1,14 @@
-Welcome to InterviewMonkey.
+# InterviewMonkey
+
+![image](https://github.com/user-attachments/assets/6c4850e4-830a-4fb5-a10b-978c58a2af00)
+
+# Showcase
+
+![image](https://github.com/user-attachments/assets/247fff60-d1e7-474c-b818-f8bb3b9298f5)
+![image](https://github.com/user-attachments/assets/0aeb5bc5-ad71-4d40-a228-51d73ba4963f)
+
+
+
 
 # 🌟Inspiration
 The interview process can be unpredictable and stressful, especially when you’re targeting different companies and roles. We wanted to create a tool that makes interview prep more personalized, engaging, and interactive, while simulating a competitive and realistic environment. That’s why we built InterviewMonkeyDuels, combining AI, machine learning, and gamification to offer a unique preparation experience for all skill levels.
